@@ -1,0 +1,135 @@
+---
+title: "Two-way Data Binding in Vanilla JS (POC)"
+description: "Building a proof of concept for two-way data binding using plain JavaScript without any frameworks."
+pubDate: 2019-02-02T00:00:00Z
+featured: false
+tags: ["javascript", "webdev", "databinding", "frontend"]
+---
+
+# Two-way Data Binding in Vanilla JS (POC)
+
+Data binding is a powerful concept in modern web development. While frameworks like Angular, Vue, and React offer sophisticated ways to bind data, understanding how to implement this pattern in vanilla JavaScript can deepen your understanding of these tools.
+
+In this post, I'll demonstrate a simple two-way data binding implementation using plain JavaScript.
+
+## What is Two-way Data Binding?
+
+Two-way data binding creates a connection between the UI and the data model:
+
+1. When the UI changes (e.g., user input), the data model updates automatically
+2. When the data model changes, the UI updates automatically
+
+Frameworks abstract this away, but the underlying concepts are straightforward.
+
+## The Implementation
+
+Here's a simple proof of concept:
+
+```javascript
+class DataBinder {
+  constructor(objectToBind) {
+    this.data = objectToBind || {};
+    this.elements = [];
+    this.eventListeners = [];
+  }
+  
+  bind(element, property) {
+    // Store the element and property
+    this.elements.push({ element, property });
+    
+    // Set initial value
+    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+      element.value = this.data[property] || '';
+      
+      // Add event listener to update data when input changes
+      const listener = () => {
+        this.data[property] = element.value;
+        this.updateBindings(property);
+      };
+      
+      element.addEventListener('input', listener);
+      this.eventListeners.push({ element, event: 'input', listener });
+    } else {
+      element.textContent = this.data[property] || '';
+    }
+    
+    return this;
+  }
+  
+  updateBindings(property) {
+    // Update all elements bound to this property
+    this.elements.forEach(el => {
+      if (el.property === property) {
+        if (el.element.tagName === 'INPUT' || el.element.tagName === 'TEXTAREA') {
+          el.element.value = this.data[property] || '';
+        } else {
+          el.element.textContent = this.data[property] || '';
+        }
+      }
+    });
+  }
+  
+  // Method to programmatically update data
+  set(property, value) {
+    this.data[property] = value;
+    this.updateBindings(property);
+    return this;
+  }
+  
+  // Clean up event listeners
+  unbindAll() {
+    this.eventListeners.forEach(({ element, event, listener }) => {
+      element.removeEventListener(event, listener);
+    });
+    this.elements = [];
+    this.eventListeners = [];
+  }
+}
+```
+
+## Usage Example
+
+Here's how you could use this data binding class:
+
+```html
+<input id="nameInput" type="text" placeholder="Enter your name">
+<p>Hello, <span id="nameDisplay"></span>!</p>
+<button id="resetBtn">Reset</button>
+
+<script>
+  const person = { name: 'Francesco' };
+  const binder = new DataBinder(person);
+  
+  // Bind the input and span to the name property
+  binder.bind(document.getElementById('nameInput'), 'name')
+        .bind(document.getElementById('nameDisplay'), 'name');
+  
+  // Add reset button functionality
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    binder.set('name', '');
+  });
+</script>
+```
+
+## Limitations
+
+This implementation is a simplified proof of concept with limitations:
+
+- It doesn't handle nested properties
+- It would need optimization for larger applications
+- No support for computed properties or watchers
+
+## Why This Matters
+
+Understanding how data binding works under the hood:
+
+1. Improves your mental model of frameworks
+2. Helps you debug complex binding issues
+3. Allows for custom implementation when needed
+4. Makes you a better JavaScript developer overall
+
+## Conclusion
+
+While you'd typically reach for a framework in production, building these patterns from scratch deepens your understanding of core web development concepts.
+
+The complete code for this proof of concept is available in this [GitHub repository](https://github.com/phoinixi/vanilla-data-binding). 

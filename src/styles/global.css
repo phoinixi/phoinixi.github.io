@@ -2,11 +2,86 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 80px; /* Adjust based on header height */
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: var(--font-sans);
+  line-height: 1.6;
+}
+
+/* Custom prose styles for dark mode */
+.dark .prose {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.dark .prose h1,
+.dark .prose h2,
+.dark .prose h3,
+.dark .prose h4,
+.dark .prose h5,
+.dark .prose h6 {
+  color: white;
+}
+
+.dark .prose a {
+  color: rgb(96, 165, 250);
+}
+
+.dark .prose strong {
+  color: white;
+}
+
+.dark .prose code {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .prose blockquote {
+  color: rgba(255, 255, 255, 0.8);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.dark .prose hr {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Garden theme */
+.garden-link {
+  @apply inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300;
+}
+
+.garden-emoji {
+  @apply text-lg mr-1;
+}
+
+.post-card {
+  @apply border border-gray-100 dark:border-gray-800 rounded-lg p-6 hover:shadow-md transition-shadow;
+}
+
+.post-title {
+  @apply text-xl font-bold text-gray-900 dark:text-white mb-2;
+}
+
+.post-date {
+  @apply text-sm text-gray-500 dark:text-gray-400 mb-2;
+}
+
+.post-description {
+  @apply text-gray-600 dark:text-gray-300 mb-4;
+}
+
+.post-tags {
+  @apply flex flex-wrap gap-2;
+}
+
+.post-tag {
+  @apply bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-2 py-1 rounded-full text-xs;
 } 

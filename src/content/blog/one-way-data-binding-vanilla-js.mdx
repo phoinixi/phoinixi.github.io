@@ -1,0 +1,132 @@
+---
+title: "One-way data binding in vanilla JS (POC)"
+description: "Learn how to implement one-way data binding in pure JavaScript without any frameworks"
+pubDate: 2019-01-25T00:00:00Z
+tags: ["showdev", "javascript", "webdev", "databinding"]
+featured: false
+---
+
+# One-way data binding in vanilla JS (POC)
+
+JavaScript frameworks like Angular, React, and Vue all provide built-in ways to bind data to the UI. But how do they work under the hood? I wanted to understand this better, so I built a simple one-way data binding implementation in vanilla JavaScript.
+
+## What is one-way data binding?
+
+One-way data binding means changes in the application state are automatically reflected in the UI, but not the other way around. The flow is:
+
+```
+Model → View
+```
+
+When the model (data) changes, the view (UI) updates automatically.
+
+## The implementation
+
+Here's a simple implementation of one-way data binding in vanilla JavaScript:
+
+```javascript
+// Our model - a simple object with some data
+const model = {
+  name: 'John',
+  age: 30
+};
+
+// Proxy to intercept property access and modifications
+const handler = {
+  set(target, property, value) {
+    target[property] = value;
+    
+    // Update all elements that use this property
+    render();
+    return true;
+  }
+};
+
+// Create a reactive proxy for our model
+const reactiveModel = new Proxy(model, handler);
+
+// Render function to update the DOM
+function render() {
+  // Find all elements with data-bind attribute
+  document.querySelectorAll('[data-bind]').forEach(element => {
+    const property = element.getAttribute('data-bind');
+    if (property in reactiveModel) {
+      element.textContent = reactiveModel[property];
+    }
+  });
+}
+
+// Initial render
+render();
+
+// Example usage:
+// <div data-bind="name"></div>
+// <div data-bind="age"></div>
+```
+
+## How it works:
+
+1. We create a model object with our data
+2. We use JavaScript's Proxy to intercept property changes
+3. When a property changes, we call the render function
+4. The render function finds all elements with a data-bind attribute and updates them
+
+## Demo
+
+Let's see it in action:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>One-way data binding in vanilla JS</title>
+</head>
+<body>
+  <h1>Hello, <span data-bind="name"></span>!</h1>
+  <p>You are <span data-bind="age"></span> years old.</p>
+  
+  <button id="updateName">Change Name</button>
+  <button id="updateAge">Change Age</button>
+  
+  <script>
+    const model = { name: 'John', age: 30 };
+    const reactiveModel = new Proxy(model, {
+      set(target, property, value) {
+        target[property] = value;
+        render();
+        return true;
+      }
+    });
+
+    function render() {
+      document.querySelectorAll('[data-bind]').forEach(element => {
+        const property = element.getAttribute('data-bind');
+        if (property in reactiveModel) {
+          element.textContent = reactiveModel[property];
+        }
+      });
+    }
+
+    // Initial render
+    render();
+
+    // Event listeners for buttons
+    document.getElementById('updateName').addEventListener('click', () => {
+      reactiveModel.name = 'Jane';
+    });
+    
+    document.getElementById('updateAge').addEventListener('click', () => {
+      reactiveModel.age = reactiveModel.age + 1;
+    });
+  </script>
+</body>
+</html>
+```
+
+## Conclusion
+
+While this is a simplified example, it demonstrates the core concept behind one-way data binding. Modern frameworks build on these ideas with more features and optimizations, like Virtual DOM for efficient updates and change detection algorithms.
+
+In my next post, I'll explore how to implement two-way data binding, where changes in the UI update the model as well.
+
+You can find the complete code example on [my GitHub](https://github.com/phoinixi/one-way-data-binding). 

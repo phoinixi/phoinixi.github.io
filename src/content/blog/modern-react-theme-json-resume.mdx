@@ -1,0 +1,131 @@
+---
+title: "I Built a Modern React Theme for JSON Resume"
+description: "A guide on how I created a custom React-based theme for the JSON Resume standard."
+pubDate: 2025-04-12T00:00:00Z
+featured: true
+tags: ["react", "resume", "typescript", "json"]
+---
+
+## Creating a Better Resume Experience with React
+
+Over the past few weeks, I've been working on a project that combines my love for clean design and React development – a modern theme for JSON Resume called **jsonresume-theme-react**.
+
+## Why Another Resume Theme?
+
+If you're not familiar with [JSON Resume](https://jsonresume.org/), it's a fantastic initiative that lets you manage your resume as a JSON file. The ecosystem has several themes, but I found most of them were either outdated or missing features I wanted.
+
+I needed something that:
+- Used modern React
+- Supported multiple languages
+- Rendered markdown in descriptions
+- Looked good both on screen and in print
+
+So I decided to build my own, and I'm pretty happy with how it turned out!
+
+![Resume Screenshot](https://raw.githubusercontent.com/phoinixi/jsonresume-theme-react/main/screenshot.png)
+
+## What Makes This Theme Different
+
+I've focused on creating a balance between professional appearance and modern functionality:
+
+- **React 18 & TypeScript** - Built on current tech for better maintainability
+- **Multi-language Support** - Create different versions of your resume for different languages
+- **Markdown in Descriptions** - Format your job descriptions with proper lists and emphasis
+- **Print-Optimized** - Carefully designed to look great when printed to PDF
+- **Responsive Design** - Looks good on everything from phones to desktops
+
+The theme uses Tailwind CSS for styling, which made it much easier to create a responsive layout that prints well.
+
+## A Look Inside
+
+The theme renders all standard sections from the JSON Resume schema:
+
+- Basic information with optional profile photo
+- Work experience with properly formatted date ranges
+- Education history
+- Skills with optional proficiency levels
+- Projects and volunteer work
+- Languages and interests
+
+Here's a small example of how work experience renders with markdown support:
+
+```json
+"work": [
+  {
+    "name": "Company Name",
+    "position": "Senior Developer",
+    "startDate": "2020-01-01",
+    "endDate": "2022-12-31",
+    "summary": "Led development of key products",
+    "description": "- Rebuilt the authentication system\n- Improved performance by 40%\n- Mentored junior developers"
+  }
+]
+```
+
+This renders as properly formatted bullets in the final resume, making it much more readable than plain text.
+
+## Supporting Multiple Languages
+
+One feature I'm particularly proud of is the multilingual support. The theme detects the language from the "language" property in your resume JSON:
+
+```json
+{
+  "basics": {
+    "name": "John Doe",
+    "label": "Programmer"
+  },
+  "language": "en",
+  "work": [
+    // work history
+  ]
+}
+```
+
+You can create versions for different languages:
+
+```json
+{
+  "basics": {
+    "name": "Jean Dupont",
+    "label": "Développeur"
+  },
+  "language": "fr",
+  "work": [
+    // work history in French
+  ]
+}
+```
+
+This is perfect if you're applying for jobs internationally or in bilingual markets.
+
+## The Development Process
+
+Building this theme taught me a lot about:
+
+1. **Optimizing for print media** - CSS for print is surprisingly tricky
+2. **Component organization** - Breaking down a resume into logical React components
+3. **Handling internationalization** - Working with dates and text in multiple languages
+4. **Balancing design and function** - Creating something that looks good but prioritizes content
+
+The most challenging part was ensuring the theme remained faithful to the JSON Resume schema while adding extra features. I wanted to make sure it would work with existing resume data without modification.
+
+## Try It Yourself
+
+If you want to give it a spin, the theme is available on npm and GitHub. I've created detailed documentation in the repository about installation and configuration options.
+
+I'd love to hear what you think or see examples if you use it for your own resume! I'm still actively developing it and plan to add more customization options in the future.
+
+## What's Next?
+
+I'm planning several improvements:
+
+- Theme customization through configuration
+- More layout variants
+- Custom sections support
+- More export options
+
+Have you used JSON Resume before? What features would you want in a resume theme? Let me know in the comments!
+
+---
+
+The project is open source and available at [github.com/phoinixi/jsonresume-theme-react](https://github.com/phoinixi/jsonresume-theme-react)

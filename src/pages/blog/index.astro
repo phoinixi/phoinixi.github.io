@@ -1,0 +1,76 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { formatDate } from "../../utils/date";
+import { getCollection, type CollectionEntry } from "astro:content";
+import "../../styles/blog.css";
+
+// Get all blog posts from the collection
+const posts = await getCollection("blog");
+
+// Sort by publication date (newest first)
+posts.sort(
+  (a: CollectionEntry<"blog">, b: CollectionEntry<"blog">) =>
+    b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+// Get unique tags across all posts
+const allTags = [
+  ...new Set(posts.flatMap((post: CollectionEntry<"blog">) => post.data.tags)),
+].sort();
+
+type BlogPost = CollectionEntry<"blog">;
+const typedPosts: BlogPost[] = posts;
+---
+
+<Layout title="Blog | Francesco Esposito">
+  <div class="container px-4 py-8 mx-auto">
+    <header class="mx-auto mb-12 max-w-4xl">
+      <div class="flex items-center mb-4">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Blog</h1>
+        <span class="ml-2 text-2xl">✍️</span>
+      </div>
+      <p class="text-lg text-gray-600 dark:text-gray-300">
+        My thoughts and tutorials on web development, frontend technologies, and
+        software engineering.
+      </p>
+    </header>
+
+    <div class="mx-auto max-w-4xl blog-container">
+      <div class="blog-post-list">
+        {
+          typedPosts.map((post) => (
+            <article class="post-card">
+              <a href={`/blog/${post.slug}`} class="block">
+                <h2 class="post-title">{post.data.title}</h2>
+                <div class="post-date">{formatDate(post.data.pubDate)}</div>
+                <p class="post-description">{post.data.description}</p>
+                <div class="post-tags">
+                  {post.data.tags.map((tag: string) => (
+                    <span class="post-tag">#{tag}</span>
+                  ))}
+                </div>
+              </a>
+            </article>
+          ))
+        }
+      </div>
+
+      {
+        allTags.length > 0 && (
+          <aside class="topics-sidebar">
+            <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">
+              Topics
+            </h2>
+            <div class="topics-list">
+              {allTags.map((tag) => (
+                <span class="block px-2 py-1 text-gray-700 topic-link dark:text-gray-300">
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          </aside>
+        )
+      }
+    </div>
+  </div>
+</Layout>
