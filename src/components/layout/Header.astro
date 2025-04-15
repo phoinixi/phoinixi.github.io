@@ -3,14 +3,13 @@ const navItems = [
   { href: "#about", label: "About" },
   { href: "#experience", label: "Experience" },
   { href: "#skills", label: "Skills" },
-  { href: "#projects", label: "Projects" },
   { href: "#mentorship", label: "Mentorship" },
   { href: "#contact", label: "Contact" },
 ];
 ---
 
 <header
-  class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm shadow-sm py-4"
+  class="fixed top-0 left-0 right-0 z-50 py-4 bg-white/90 backdrop-blur-sm shadow-sm"
 >
   <div class="container mx-auto px-4 flex justify-between items-center">
     <a
@@ -40,28 +39,15 @@ const navItems = [
     <button
       id="mobile-menu-button"
       class="md:hidden p-2 rounded-md text-gray-600 hover:text-blue-600 hover:bg-gray-100"
-      aria-label="Toggle menu"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        class="w-6 h-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M4 6h16M4 12h16M4 18h16"></path>
-      </svg>
+      Menu
     </button>
   </div>
 
   <!-- Mobile menu, hidden by default -->
   <div
     id="mobile-menu"
-    class="md:hidden hidden bg-white border-t border-gray-100 px-4 py-2"
+    class="hidden md:hidden bg-white border-t border-gray-100 px-4 py-2"
   >
     <ul class="flex flex-col gap-2">
       {
@@ -90,15 +76,6 @@ const navItems = [
       menuButton.addEventListener("click", () => {
         mobileMenu.classList.toggle("hidden");
       });
-
-      // Close mobile menu when clicking on a link
-      const mobileLinks = mobileMenu.querySelectorAll("a");
-      mobileLinks.forEach((link) => {
-        link.addEventListener("click", () => {
-          mobileMenu.classList.add("hidden");
-        });
-      });
     }
   });
 </script>
-

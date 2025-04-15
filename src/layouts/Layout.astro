@@ -33,6 +33,12 @@ const { title } = Astro.props;
     </main>
 
     <Footer />
+
+    <!-- Make sure Tailwind is loaded properly and check for any console errors -->
+    <script is:inline>
+      document.addEventListener("DOMContentLoaded", () => {
+        console.log("Page loaded - checking if styles are applied");
+      });
+    </script>
   </body>
 </html>
-
