@@ -1,0 +1,71 @@
+---
+const currentYear = new Date().getFullYear();
+const socialLinks = [
+  { platform: "GitHub", url: "https://github.com/phoinixi", icon: "github" },
+  {
+    platform: "LinkedIn",
+    url: "https://www.linkedin.com/in/francescoes/",
+    icon: "linkedin",
+  },
+  {
+    platform: "MentorCruise",
+    url: "https://mentorcruise.com/mentor/francescoesposito/",
+    icon: "message-circle",
+  },
+];
+---
+
+<footer class="bg-gray-50 py-12 mt-24">
+  <div class="container mx-auto px-4">
+    <div class="flex flex-col md:flex-row justify-between items-center">
+      <div class="mb-6 md:mb-0">
+        <p class="text-gray-500">
+          © {currentYear} Francesco Esposito. All rights reserved.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-6">
+        {
+          socialLinks.map((link) => (
+            <a
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-gray-500 hover:text-blue-600 transition-colors"
+              aria-label={`Visit Francesco's ${link.platform}`}
+            >
+              <svg
+                class="w-6 h-6"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {link.icon === "github" && (
+                  <path
+                    d="M12 2C6.477 2 2 6.484 2 12.017C2 16.5 4.865 20.317 8.84 21.6C9.34 21.7 9.5 21.4 9.5 21.133V19.234C6.67 19.867 6.15 17.967 6.15 17.967C5.75 16.834 5.2 16.534 5.2 16.534C4.47 15.867 5.27 15.884 5.27 15.884C6.09 15.95 6.56 16.95 6.56 16.95C7.33 18.534 8.77 18 9.54 17.75C9.63 17.1 9.89 16.667 10.17 16.417C7.95 16.167 5.62 15.267 5.62 11.334C5.62 10.233 6 9.334 6.58 8.65C6.47 8.4 6.12 7.35 6.68 5.867C6.68 5.867 7.39 5.6 9.5 6.967C10.29 6.75 11.15 6.65 12 6.65C12.85 6.65 13.71 6.75 14.5 6.967C16.61 5.6 17.32 5.867 17.32 5.867C17.88 7.35 17.53 8.4 17.42 8.65C18 9.334 18.38 10.233 18.38 11.334C18.38 15.267 16.04 16.167 13.82 16.417C14.17 16.734 14.5 17.367 14.5 18.334V21.133C14.5 21.4 14.66 21.7 15.17 21.6C19.135 20.317 22 16.5 22 12.017C22 6.484 17.523 2 12 2Z"
+                    fill="currentColor"
+                  />
+                )}
+                {link.icon === "linkedin" && (
+                  <path
+                    d="M16 8C17.5913 8 19.1174 8.63214 20.2426 9.75736C21.3679 10.8826 22 12.4087 22 14V20H18V14C18 13.4696 17.7893 12.9609 17.4142 12.5858C17.0391 12.2107 16.5304 12 16 12C15.4696 12 14.9609 12.2107 14.5858 12.5858C14.2107 12.9609 14 13.4696 14 14V20H10V14C10 12.4087 10.6321 10.8826 11.7574 9.75736C12.8826 8.63214 14.4087 8 16 8ZM2 6H6V20H2V6Z"
+                    fill="currentColor"
+                  />
+                )}
+                {link.icon === "message-circle" && (
+                  <path
+                    d="M21 11.5C21.0034 12.8199 20.6951 14.1219 20.1 15.3C19.3944 16.7118 18.3098 17.8992 16.9674 18.7293C15.6251 19.5594 14.0782 19.9994 12.5 20C11.1801 20.0035 9.87812 19.6951 8.7 19.1L3 21L4.9 15.3C4.30493 14.1219 3.99656 12.8199 4 11.5C4.00061 9.92179 4.44061 8.37488 5.27072 7.03258C6.10083 5.69028 7.28825 4.6056 8.7 3.90003C9.87812 3.30496 11.1801 2.99659 12.5 3.00003H13C15.0843 3.11502 17.053 3.99479 18.5291 5.47089C20.0052 6.94699 20.885 8.91568 21 11V11.5Z"
+                    fill="currentColor"
+                  />
+                )}
+              </svg>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</footer>
+

@@ -1,0 +1,98 @@
+---
+const skillCategories = [
+  {
+    title: "Frontend Development",
+    skills: [
+      "TypeScript",
+      "React",
+      "Redux",
+      "Recoil",
+      "Jotai",
+      "Fluent UI",
+      "Angular",
+      "Vue.js",
+      "Svelte",
+      "HTML5",
+      "CSS",
+      "Sass",
+      "Jest",
+      "Highcharts",
+      "D3.js",
+    ],
+  },
+  {
+    title: "Tooling",
+    skills: [
+      "Webpack",
+      "Vite",
+      "Nx",
+      "Yarn",
+      "Lerna",
+      "ESLint",
+      "Git",
+      "Docker",
+      "Azure DevOps",
+      "Jira",
+    ],
+  },
+  {
+    title: "Backend Development",
+    skills: ["Node.js", "Express", "C#"],
+  },
+  {
+    title: "Other",
+    skills: [
+      "Data Visualization",
+      "Data Integration",
+      "Web Scraping",
+      "Mentoring",
+    ],
+  },
+];
+---
+
+<section id="skills" class="py-20 bg-gray-50">
+  <div class="container mx-auto px-4">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4 text-center">
+        Skills
+      </h2>
+      <p class="text-gray-600 text-center mb-12 max-w-3xl mx-auto">
+        I've worked with a wide range of technologies throughout my career. Here
+        are some of the skills I've developed along the way.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {
+          skillCategories.map((category) => (
+            <div class="bg-white p-6 rounded-lg shadow-sm">
+              <h3 class="text-xl font-semibold text-gray-800 mb-4 border-b border-gray-100 pb-2">
+                {category.title}
+              </h3>
+              <ul class="space-y-2">
+                {category.skills.map((skill) => (
+                  <li class="flex items-center gap-2">
+                    <svg
+                      class="w-5 h-5 text-blue-600"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                    <span class="text-gray-700">{skill}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
