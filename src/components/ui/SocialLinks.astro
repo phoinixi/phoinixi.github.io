@@ -1,0 +1,107 @@
+---
+import { SOCIAL_LINKS } from "../../consts";
+
+export interface Props {
+  variant?: "icons" | "text" | "both";
+  className?: string;
+  size?: "sm" | "md" | "lg";
+}
+
+const { variant = "icons", className = "", size = "md" } = Astro.props;
+
+// Size classes mapping
+const sizeClasses = {
+  sm: "h-4 w-4",
+  md: "h-6 w-6",
+  lg: "h-8 w-8",
+};
+
+const iconSize = sizeClasses[size];
+---
+
+<div class:list={["social-links", className]}>
+  {
+    variant === "icons" || variant === "both" ? (
+      <div class="flex space-x-4">
+        {SOCIAL_LINKS.map((link) => (
+          <a
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+            aria-label={link.name}
+          >
+            {variant === "both" && <span class="sr-only">{link.name}</span>}
+            {link.icon === "github" && (
+              <svg
+                class={iconSize}
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            )}
+            {link.icon === "linkedin" && (
+              <svg
+                class={iconSize}
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path d="M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z" />
+              </svg>
+            )}
+            {link.icon === "mentorcruise" && (
+              <svg
+                class={iconSize}
+                fill="currentColor"
+                viewBox="0 0 60 60"
+                aria-hidden="true"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M0 30C0 24.0666 1.75945 18.2664 5.0559 13.3329C8.35234 8.39941 13.0377 4.55425 18.5195 2.28362C24.0013 0.0129938 30.0333 -0.5811 35.8527 0.576457C41.6721 1.73401 47.0176 4.59123 51.2132 8.7868C55.4088 12.9824 58.266 18.3279 59.4235 24.1473C60.5811 29.9667 59.987 35.9987 57.7164 41.4805C55.4457 46.9623 51.6006 51.6476 46.6671 54.9441C41.7336 58.2405 35.9334 60 30 60C26.0603 60 22.1592 59.224 18.5195 57.7164C14.8797 56.2088 11.5725 53.999 8.78675 51.2132C6.00099 48.4275 3.79123 45.1203 2.2836 41.4805C0.775959 37.8407 -7.62939e-06 33.9397 0 30ZM23.6848 18.7418L17.3698 29.6797H29.0331V9.4784L23.6848 18.7418ZM30.9668 9.47817V29.6797H42.63L36.315 18.7418L30.9668 9.47817ZM52.1444 31.6134H7.85548L12.0545 38.886H47.9455L52.1444 31.6134ZM46.8291 40.8198H13.1708L17.3698 48.0927H42.63L46.8291 40.8198Z"
+                />
+              </svg>
+            )}
+            {link.icon === "email" && (
+              <svg
+                class={iconSize}
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path d="M20,8L12,13L4,8V6L12,11L20,6M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z" />
+              </svg>
+            )}
+          </a>
+        ))}
+      </div>
+    ) : null
+  }
+
+  {
+    variant === "text" && (
+      <ul class="space-y-2">
+        {SOCIAL_LINKS.map((link) => (
+          <li>
+            <a
+              href={link.url}
+              class="py-0.5 text-blue-600 dark:text-blue-400 text-sm block hover:opacity-80 transition-opacity"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {link.name}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</div>
