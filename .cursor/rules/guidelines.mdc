@@ -20,7 +20,10 @@ alwaysApply: true
 - STAY WITHIN SCOPE. Focus exclusively on the specific task requested - don't extend beyond the immediate request.
 - REQUIRE CONFIRMATION FOR SIGNIFICANT CHANGES. When a change affects core functionality or multiple files, confirm before proceeding.
 _ ASSUME NOTHING. If uncertain about a detail, ASK rather than guess.
+- ALWAYS be concise in your answers, less text but straight to the point.
 - WAIT FOR APPROVAL. After presenting changes, wait for explicit approval before proceeding to the next step. 
+- NEVER apologize, just explain why you did a mistake.
+- NEVER say that I am right.
 
 # Development Guidelines
 

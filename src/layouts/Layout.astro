@@ -253,12 +253,12 @@ const {
       )
     }
 
-    <div class="flex flex-col flex-1 lg:ml-64">
+    <div class="flex flex-col flex-1 lg:ml-64 min-w-0">
       <Header />
 
       <!-- Main content -->
       <main
-        class={`flex-1 px-6 py-8 mt-16 ${className}`}
+        class:list={["flex-1", "px-6", "py-8", "mt-16", className]}
         transition:animate={fade({ duration: 500 })}
       >
         <slot />
