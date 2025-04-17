@@ -28,10 +28,10 @@ My [dotfiles repository](https://github.com/phoinixi/dotfiles) is organized into
 ```
 dotfiles/
 ├── git/                    # Git configuration
-├── oh-my-zsh/              # ZSH configuration
 ├── osx/                    # macOS-specific configurations
 ├── utils/                  # Utility scripts
 ├── .editorconfig           # Editor configuration
+├── .zshrc                  # Zsh configuration (replaces oh-my-zsh/ folder)
 ├── Brewfile                # Homebrew package definitions
 ├── install.sh              # Main installation script
 └── README.md               # Documentation
@@ -43,61 +43,33 @@ This modular approach makes it easy to find and modify specific parts of your co
 
 ### Powerful Aliases 💪
 
-One of the biggest time-savers in my dotfiles is the collection of carefully crafted aliases. Here are the ones included in the repository:
-
-#### Folders & Finder Aliases
-
-Instead of typing the same commands over and over, I use these shortcuts:
+My `.zshrc` file includes several useful aliases to speed up common tasks. Some examples:
 
 ```bash
-# Navigation shortcuts
-alias l="ls -la"
-alias ..="cd .."
-alias ~="cd ~"
-alias rm="rm -rf"
+# Replacements for common commands with modern alternatives
+alias ls='eza --icons'
+alias ll='eza -l --icons'
+alias la='eza -la --icons'
+alias cat='bat'
+
+# Navigation & Finder
 alias w="cd ~/workspace"
-
-# Finder interactions
 alias finder="open ."
-alias clean="find . -name '*.DS_Store' -type f -delete"
+
+# JS Development
+alias nfresh="rm -rf node_modules/ package-lock.json && npm install"
+alias dev="npm run dev"
+
+# System Utilities
+alias ip="ifconfig -a | grep -o 'inet6\\? \\(addr:\\)\\?\\s\\?\\(\\(\\(\[0-9\]\\+\\.\\)\\{3\\}\[0-9\]\\+\\)\\|\[a-fA-F0-9:\]\\+\\)' | awk '{ sub(/inet6? (addr:)? ?/, \"\"); print }'"
+alias clean="find . -name '*.DS_Store' -type f -ls -delete"
+alias zip="zip -r -X -9"
+
+# Update All
+alias update='brew update; brew upgrade; brew cleanup; npm update npm -g; npm update -g;'
 ```
 
-#### Utility Aliases
-
-These aliases make common system tasks much simpler:
-
-```bash
-# System utilities
-alias ip="curl ifconfig.me"
-alias emptytrash="sudo rm -rfv /Volumes/*/.Trashes; rm -rfv ~/.Trash"
-alias zip="zip -r"
-alias code="open -a 'Visual Studio Code'"
-alias update="brew update && brew upgrade && npm update -g"
-alias chrome="open -a 'Google Chrome'"
-```
-
-#### Git Aliases
-
-The Git aliases are particularly useful for streamlining your workflow:
-
-```bash
-# Git shortcuts
-alias git\ c="git commit -m"
-alias git\ ca="git commit -am"
-alias git\ snapshot="!git stash save \"snapshot: $(date)\" && git stash apply \"stash@{0}\""
-alias git\ snapshots="!git stash list --grep snapshot"
-alias git\ amend="git commit --amend"
-alias git\ co="git checkout"
-alias git\ cob="git checkout -b"
-alias git\ d="git diff"
-alias git\ l="git log --graph --date=short"
-alias git\ changes="git log --pretty=format:\"%h %cr %cn %Cgreen%s%Creset\" --name-status"
-alias git\ unstage="git reset HEAD"
-alias git\ uncommit="git reset --soft HEAD^"
-alias git\ st="git status"
-```
-
-The `git snapshot` command is particularly useful for creating a quick, labeled save point without creating a formal commit.
+Additional aliases, particularly for Git, are provided by the enabled Oh My Zsh plugins (like `git`, `node`, `docker`, etc.).
 
 ### Homebrew Package Management: The Brewfile 🍺
 
@@ -106,37 +78,61 @@ The Brewfile is one of the most powerful components of my dotfiles. It leverages
 Here's a snippet from my actual Brewfile:
 
 ```ruby
-# packages
+# Core Utilities
 brew "bash"
-brew "bash-completion"
+brew "bash-completion@2"
 brew "coreutils"
-brew "curl"
-brew "fnm"
-brew "wget"
-brew "pnpm"
+brew "git"
 brew "gh"
-brew "node"
+brew "curl"
 
-# casks with conditionals to skip if already installed
-system("brew list --cask brave-browser || brew install --cask brave-browser")
-system("brew list --cask visual-studio-code || brew install --cask visual-studio-code")
-system("brew list --cask chatgpt || brew install --cask chatgpt")
-system("brew list --cask appcleaner || brew install --cask appcleaner")
-system("brew list --cask raycast || brew install --cask raycast")
-system("brew list --cask hyper || brew install --cask hyper")
+# Development Utilities
+brew "fzf"
+brew "ripgrep"
+brew "bat"
+brew "eza"
+
+# Frontend Development
+brew "fnm"
+brew "pnpm"
+
+# --- Casks ---
+
+# Fonts
+cask "font-hack-nerd-font"
+
+# Terminals
+cask "hyper"
+
+# Editors / IDEs
+cask "visual-studio-code"
+cask "cursor"
+
+# Browsers
+cask "brave-browser"
+
+# Productivity & Utilities
+cask "raycast"
+cask "docker"
+
+# Communication
+cask "slack"
 ```
 
 This Brewfile automatically installs:
 
-- 🔧 Core command-line utilities (`bash`, `curl`, `wget`)
-- 💻 Development tools (`node`, `pnpm`, `gh`)
-- 📱 Applications (VS Code, Brave browser, ChatGPT, Raycast)
+- 🔧 **Core Utilities:** `bash`, `coreutils`, `git`, `gh`, `curl`, etc.
+- 💻 **Development Utilities:** `fzf` (fuzzy finder), `ripgrep` (search), `bat` (cat clone), `eza` (ls replacement), etc.
+- 🌐 **Frontend:** `fnm` (Node version manager), `pnpm`.
+- ✍️ **Fonts:** `font-hack-nerd-font` (for terminal glyphs).
+- ⌨️ **Apps:** `hyper` (Terminal), VS Code, Cursor, Brave, Raycast, Docker, Slack, etc.
+- ✨ **QuickLook Plugins:** Various plugins for previewing code, markdown, json, etc. (Check `Brewfile` for full list).
 
 When you run the installation script, Homebrew reads this file and installs everything in one go. If a package is already installed, it simply skips it.
 
 ### Oh-My-Zsh Configuration 💻
 
-My setup uses [Oh-My-Zsh](https://ohmyz.sh/) as the shell framework, with a customized Solarized Dark theme. This provides:
+My setup uses [Oh-My-Zsh](https://ohmyz.sh/) as the shell framework, with a customized Solarized Dark theme. The main configuration now resides in the `.zshrc` file in the repository root, which sources Oh My Zsh and applies customizations. This provides:
 
 - 📜 Better command history management
 - ⌨️ Improved tab completion
@@ -153,31 +149,9 @@ The prompt shows your current directory and git branch at a glance, making it ea
 
 ### macOS System Preferences 🖥️
 
-The repository also includes scripts in the `osx` directory that configure macOS system preferences for a developer-friendly experience:
+The repository also includes scripts in the `osx` directory, primarily `index.sh`, that configure various macOS system preferences for a developer-friendly experience. You can review `osx/index.sh` to see the specific settings applied.
 
-```bash
-#!/bin/bash
-
-# Set computer name
-sudo scutil --set ComputerName "macbook-pro"
-sudo scutil --set HostName "macbook-pro"
-sudo scutil --set LocalHostName "macbook-pro"
-
-# Disable the sound effects on boot
-sudo nvram SystemAudioVolume=" "
-
-# Expand save panel by default
-defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
-defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
-
-# Automatically quit printer app once the print jobs complete
-defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
-
-# Disable auto-correct
-defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
-```
-
-These settings create a more efficient development environment right from the start, with:
+These settings aim to create a more efficient development environment right from the start, with:
 
 - 🚀 Performance optimizations
 - 🖥️ Dock settings for optimal screen real estate
@@ -213,13 +187,29 @@ Once you've set up your dotfiles, it's important to keep them updated as your pr
 
 ## Installation 📥
 
-Getting started is simple. Just run:
+Getting started is simple:
 
-```bash
-git clone https://github.com/phoinixi/dotfiles.git ~/dotfiles && (cd ~/dotfiles && ./install.sh) && rm ~/dotfiles
-```
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/phoinixi/dotfiles.git ~/.dotfiles
+    ```
+    _(Using `~/.dotfiles` is a common convention, but you can choose another location)_
 
-This one-liner clones the repository, runs the installation script, and cleans up after itself.
+2.  **Run the installation script:**
+    ```bash
+    cd ~/.dotfiles
+    ./install.sh
+    ```
+
+The script will handle installing Homebrew, packages, Oh My Zsh, setting up symlinks, and applying macOS settings.
+
+3.  **Restart your terminal:** Open a new terminal window/tab or run `source ~/.zshrc`.
+
+4.  **(Manual Step) Configure Git User:**
+    ```bash
+    git config --global user.name "Your Name"
+    git config --global user.email "your.email@example.com"
+    ```
 
 ## Conclusion 🏁
 
@@ -231,4 +221,4 @@ Check out the [full repository on GitHub](https://github.com/phoinixi/dotfiles) 
 
 ---
 
-*What's your favorite dotfiles trick? Let me know in the comments below!* 
+*What's your favorite dotfiles trick? Let me know in the comments below!*
