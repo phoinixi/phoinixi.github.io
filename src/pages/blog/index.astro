@@ -17,7 +17,9 @@ posts.sort(
 
 // Get unique tags across all posts
 const allTags = [
-  ...new Set(posts.flatMap((post: CollectionEntry<"blog">) => post.data.tags)),
+  ...new Set(
+    posts.flatMap((post: CollectionEntry<"blog">) => post.data.tags || [])
+  ),
 ].sort();
 
 type BlogPost = CollectionEntry<"blog">;
@@ -29,45 +31,26 @@ const typedPosts: BlogPost[] = posts;
     title="Blog"
     description="My thoughts and tutorials on web development, frontend technologies, and software engineering."
   >
-    <div class="grid grid-cols-1 gap-8 md:grid-cols-[3fr_1fr]">
-      <div class="flex flex-col gap-8">
-        {
-          typedPosts.map((post) => (
-            <Card url={`/blog/${post.slug}`}>
-              <h2 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">
-                {post.data.title}
-              </h2>
-              <div class="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                {formatDate(post.data.pubDate)}
-              </div>
-              <p class="mb-4 text-gray-600 dark:text-gray-300">
-                {post.data.description}
-              </p>
-              <div class="flex flex-wrap gap-2">
-                {post.data.tags.map((tag: string) => (
-                  <Tag text={tag} />
-                ))}
-              </div>
-            </Card>
-          ))
-        }
-      </div>
-
+    <div class="flex flex-col gap-8">
       {
-        allTags.length > 0 && (
-          <aside class="sticky top-8 self-start p-6 bg-white rounded-lg border border-gray-100 dark:border-gray-800 dark:bg-gray-900">
-            <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">
-              Topics
+        typedPosts.map((post) => (
+          <Card url={`/blog/${post.slug}`}>
+            <h2 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">
+              {post.data.title}
             </h2>
-            <div class="flex flex-col gap-2">
-              {allTags.map((tag) => (
-                <span class="block px-2 py-1 text-gray-700 rounded dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
-                  #{tag}
-                </span>
+            <div class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+              {formatDate(post.data.pubDate)}
+            </div>
+            <p class="mb-4 text-gray-600 dark:text-gray-300">
+              {post.data.description}
+            </p>
+            <div class="flex flex-wrap gap-2">
+              {post.data.tags.map((tag: string) => (
+                <Tag text={tag} />
               ))}
             </div>
-          </aside>
-        )
+          </Card>
+        ))
       }
     </div>
   </PageLayout>

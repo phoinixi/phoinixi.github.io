@@ -2,8 +2,16 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import PageLayout from "../../components/layout/PageLayout.astro";
+import TocSidebar from "../../components/blog/TocSidebar.astro";
 import { formatDate } from "../../utils/date";
 import GiscusComments from "../../components/blog/GiscusComments.astro";
+
+// Define a local Heading type as a workaround for linter issues
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
 
 export async function getStaticPaths() {
   const blogEntries = await getCollection("blog");
@@ -19,49 +27,57 @@ type Props = {
 };
 
 const { entry } = Astro.props as Props;
-const { Content } = await entry.render();
+const { Content, headings }: { Content: any; headings: Heading[] } =
+  await entry.render();
 const { title, description, pubDate, updatedDate, heroImage, tags } =
   entry.data;
 ---
 
 <Layout title={title} description={description}>
-  <PageLayout title={title} description={description}>
-    <div class="mb-10">
-      <div class="mb-2 text-gray-500 dark:text-gray-400">
-        {formatDate(pubDate)}
-        {
-          updatedDate && (
-            <span class="ml-2">(Updated: {formatDate(updatedDate)})</span>
-          )
-        }
-      </div>
-      {
-        heroImage && (
-          <img
-            src={heroImage}
-            alt={title}
-            class="mb-6 w-full h-auto rounded-lg max-w-3xl mx-auto"
-          />
-        )
-      }
-      {
-        tags && tags.length > 0 && (
-          <div class="flex flex-wrap gap-2 mt-4">
-            {tags.map((tag: string) => (
-              <a
-                href={`/blog/tag/${tag}`}
-                class="px-3 py-1 text-sm text-gray-800 bg-gray-100 rounded-full transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-              >
-                #{tag}
-              </a>
-            ))}
+  <div class="grid grid-cols-1 xl:grid-cols-[1fr,280px] gap-12">
+    <div class="min-w-0">
+      <PageLayout title={title} description={description}>
+        <div class="mb-10 xl:hidden">
+          <div class="mb-2 text-gray-500 dark:text-gray-400">
+            {formatDate(pubDate)}
+            {
+              updatedDate && (
+                <span class="ml-2">(Updated: {formatDate(updatedDate)})</span>
+              )
+            }
           </div>
-        )
-      }
+          {
+            heroImage && (
+              <img
+                src={heroImage}
+                alt={title}
+                class="mx-auto mb-6 w-full max-w-3xl h-auto rounded-lg"
+              />
+            )
+          }
+          {
+            tags && tags.length > 0 && (
+              <div class="flex flex-wrap gap-2 mt-4">
+                {tags.map((tag: string) => (
+                  <a
+                    href={`/blog/tag/${tag}`}
+                    class="px-3 py-1 text-sm text-gray-800 bg-gray-100 rounded-full transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                  >
+                    #{tag}
+                  </a>
+                ))}
+              </div>
+            )
+          }
+        </div>
+
+        <Content />
+
+        <GiscusComments />
+      </PageLayout>
     </div>
-
-    <Content />
-
-    <GiscusComments />
-  </PageLayout>
+    <div class="hidden border-l border-gray-200 xl:block dark:border-gray-700">
+      <TocSidebar pubDate={pubDate} tags={tags} headings={headings} />
+    </div>
+  </div>
 </Layout>

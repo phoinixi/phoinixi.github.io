@@ -1,0 +1,78 @@
+---
+// Define a local Heading type as a workaround for linter issues
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+import { formatDate } from "../../utils/date";
+
+interface Props {
+  pubDate: string | Date;
+  tags: string[];
+  headings: Heading[]; // Use local Heading type
+}
+
+const { pubDate, tags = [], headings = [] } = Astro.props;
+
+// Filter headings
+const filteredHeadings = headings.filter((h: Heading) => h.depth === 2); // Added type to h
+---
+
+<aside class="overflow-y-auto fixed top-24 px-2 pl-6">
+  <h3
+    class="pb-2 mb-4 text-lg font-semibold text-gray-900 border-b dark:text-white dark:border-gray-700"
+  >
+    Post Details
+  </h3>
+
+  <div class="mb-6 space-y-2 text-sm">
+    <div>
+      <strong class="text-gray-700 dark:text-gray-300">Published:</strong>
+      <span class="ml-2 text-gray-600 dark:text-gray-400"
+        >{formatDate(pubDate)}</span
+      >
+    </div>
+
+    {
+      tags.length > 0 && (
+        <div>
+          <strong class="text-gray-700 dark:text-gray-300">Tags:</strong>
+          <div class="flex flex-wrap gap-1 mt-1">
+            {tags.map((tag: string) => (
+              <a
+                href={`/blog/tag/${tag}`}
+                class="px-2 py-0.5 text-xs text-gray-800 bg-gray-100 rounded-full transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+              >
+                #{tag}
+              </a>
+            ))}
+          </div>
+        </div>
+      )
+    }
+  </div>
+
+  {
+    filteredHeadings.length > 0 && (
+      <>
+        <h3 class="pb-2 mb-3 text-lg font-semibold text-gray-900 border-b dark:text-white dark:border-gray-700">
+          In This Article
+        </h3>
+        <ul class="space-y-3 text-sm">
+          {filteredHeadings.map((heading: Heading) => (
+            <li class:list={[{ "pl-4": heading.depth === 3 }]}>
+              <a
+                href={`#${heading.slug}`}
+                class="text-gray-600 transition-colors hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
+              >
+                {heading.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </>
+    )
+  }
+</aside>
