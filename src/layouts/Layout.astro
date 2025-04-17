@@ -2,42 +2,35 @@
 // src/layouts/Layout.astro
 // Global styles import
 import "../styles/global.css";
+import BaseHead from "../components/layout/BaseHead.astro";
 import Header from "../components/layout/Header.astro";
 import Footer from "../components/layout/Footer.astro";
+import Sidebar from "../components/layout/Sidebar.astro";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
+import { ViewTransitions, fade } from "astro:transitions";
 
-export interface Props {
-  title: string;
+interface Props {
+  title?: string;
   description?: string;
+  showSidebar?: boolean;
+  class?: string;
   ogImage?: string;
 }
 
 const {
-  title,
-  description = "Francesco Esposito - Software Engineer specializing in Frontend development with React, TypeScript, and modern web technologies.",
-  ogImage = "/images/og-image.png",
+  title = SITE_TITLE,
+  description = SITE_DESCRIPTION,
+  showSidebar = true,
+  class: className,
+  ogImage,
 } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en" class="scroll-smooth">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description} />
-    <meta name="generator" content={Astro.generator} />
-
-    <!-- Open Graph / Social Media -->
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:image" content={ogImage} />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content={Astro.url.href} />
-
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImage} />
+    <BaseHead title={title} description={description} image={ogImage} />
+    <ViewTransitions />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -69,23 +62,209 @@ const {
         document.documentElement.classList.remove("dark");
       }
     </script>
+
+    <!-- View Transitions and page loader -->
+    <script>
+      // Update active link when navigating
+      document.addEventListener("astro:page-load", () => {
+        // Get all nav links
+        const navLinks = document.querySelectorAll("nav a");
+        const path = window.location.pathname;
+
+        // Update active state
+        navLinks.forEach((link) => {
+          const href = link.getAttribute("href");
+          const isActive = path === href || path.startsWith(`${href}/`);
+
+          // Reset all links
+          link.classList.remove(
+            "text-blue-600",
+            "dark:text-blue-400",
+            "border-b-2",
+            "border-blue-600",
+            "dark:border-blue-400"
+          );
+          link.classList.add(
+            "text-gray-600",
+            "dark:text-gray-300",
+            "hover:text-blue-600",
+            "dark:hover:text-blue-400"
+          );
+
+          // Set active link
+          if (isActive) {
+            link.classList.remove("text-gray-600", "dark:text-gray-300");
+            link.classList.add(
+              "text-blue-600",
+              "dark:text-blue-400",
+              "border-b-2",
+              "border-blue-600",
+              "dark:border-blue-400"
+            );
+          }
+        });
+
+        // Initialize mobile menu after each page load
+        initMobileMenu();
+      });
+
+      // Handle theme persistence during view transitions
+      document.addEventListener("astro:after-swap", () => {
+        // Apply the theme after a page transition
+        if (
+          localStorage.getItem("theme") === "dark" ||
+          (!localStorage.getItem("theme") &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ) {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+
+        // Close mobile menu after page change
+        const mobileMenu = document.getElementById("mobile-menu");
+        if (mobileMenu && !mobileMenu.classList.contains("hidden")) {
+          mobileMenu.classList.add("hidden");
+          document.body.style.overflow = "";
+        }
+      });
+
+      // Initialize mobile menu
+      function initMobileMenu() {
+        const menuButton = document.getElementById("mobile-menu-button");
+        const mobileMenu = document.getElementById("mobile-menu");
+        const closeMenu = document.getElementById("close-mobile-menu");
+        const themeToggle = document.getElementById("theme-toggle");
+
+        if (menuButton && mobileMenu && closeMenu) {
+          // Remove existing listeners to avoid duplicates
+          menuButton.replaceWith(menuButton.cloneNode(true));
+          closeMenu.replaceWith(closeMenu.cloneNode(true));
+
+          // Get fresh references after cloning
+          const newMenuButton = document.getElementById("mobile-menu-button");
+          const newCloseMenu = document.getElementById("close-mobile-menu");
+
+          // Add event listeners
+          if (newMenuButton) {
+            newMenuButton.addEventListener("click", () => {
+              mobileMenu.classList.remove("hidden");
+              document.body.style.overflow = "hidden";
+            });
+          }
+
+          if (newCloseMenu) {
+            newCloseMenu.addEventListener("click", () => {
+              mobileMenu.classList.add("hidden");
+              document.body.style.overflow = "";
+            });
+          }
+
+          // Handle mobile menu links
+          if (mobileMenu) {
+            // Find all navigation links in the mobile menu
+            const mobileLinks = Array.from(
+              mobileMenu.querySelectorAll("nav a")
+            );
+
+            // Get the site title link from the mobile menu (not in the nav element)
+            const siteTitleLink = mobileMenu.querySelector('a[href="/"]');
+            if (siteTitleLink && !mobileLinks.includes(siteTitleLink)) {
+              mobileLinks.push(siteTitleLink);
+            }
+
+            // Process all links
+            mobileLinks.forEach((link) => {
+              // Clone and replace to remove existing listeners
+              const newLink = link.cloneNode(true);
+              link.parentNode?.replaceChild(newLink, link);
+
+              // Add custom click handler to each link
+              newLink.addEventListener("click", (e) => {
+                e.preventDefault(); // Prevent default navigation
+                const href = (newLink as HTMLAnchorElement).getAttribute(
+                  "href"
+                );
+
+                // We're using a 10ms timeout to keep the menu open during navigation
+                setTimeout(() => {
+                  window.location.href = href || "/";
+                }, 10);
+              });
+            });
+          }
+        }
+
+        if (themeToggle) {
+          // Remove existing listeners to avoid duplicates
+          themeToggle.replaceWith(themeToggle.cloneNode(true));
+
+          // Get fresh reference after cloning
+          const newThemeToggle = document.getElementById("theme-toggle");
+
+          // Add event listener
+          if (newThemeToggle) {
+            newThemeToggle.addEventListener("click", () => {
+              const isDark = document.documentElement.classList.toggle("dark");
+              localStorage.setItem("theme", isDark ? "dark" : "light");
+            });
+          }
+        }
+      }
+
+      // Initialize mobile menu on first load
+      document.addEventListener("DOMContentLoaded", initMobileMenu);
+    </script>
+
+    <style>
+      /* Content transition styles */
+      ::view-transition-old(root),
+      ::view-transition-new(root) {
+        animation-duration: 0.5s;
+      }
+    </style>
   </head>
   <body
-    class="flex flex-col min-h-screen text-gray-900 bg-white dark:bg-gray-900 dark:text-gray-100"
+    class="flex min-h-screen font-sans text-gray-900 bg-white bg-[size:224px] dark:bg-gray-900 dark:text-gray-100"
   >
-    <Header />
+    <!-- Page transition loader -->
+    <div id="page-loader" class="page-loader opacity-0"></div>
 
-    <main class="flex-grow py-10">
-      <slot />
-    </main>
+    {
+      showSidebar && (
+        <aside
+          class="hidden fixed top-0 left-0 z-50 w-64 h-screen bg-gray-50 border-r border-gray-200 lg:flex lg:flex-col dark:bg-gray-800 dark:border-gray-700"
+          transition:persist
+        >
+          <div class="border-b border-gray-200 dark:border-gray-700">
+            <div class="px-6 py-4">
+              <a
+                href="/"
+                class="flex items-center h-9 text-lg font-semibold tracking-tight text-blue-600 transition-opacity dark:text-blue-400 hover:opacity-80 leading-[36px]"
+              >
+                {SITE_TITLE}
+              </a>
+            </div>
+          </div>
+          <div class="overflow-y-auto flex-1 p-6">
+            <Sidebar />
+          </div>
+        </aside>
+      )
+    }
 
-    <Footer />
+    <div class="flex flex-col flex-1 lg:ml-64">
+      <Header />
 
-    <!-- Make sure Tailwind is loaded properly and check for any console errors -->
-    <script is:inline>
-      document.addEventListener("DOMContentLoaded", () => {
-        console.log("Page loaded - checking if styles are applied");
-      });
-    </script>
+      <!-- Main content -->
+      <main
+        class={`flex-1 px-6 py-8 mt-16 ${className}`}
+        transition:animate={fade({ duration: 500 })}
+      >
+        <slot />
+      </main>
+
+      <Footer hideSidebarContent={showSidebar} />
+    </div>
   </body>
 </html>

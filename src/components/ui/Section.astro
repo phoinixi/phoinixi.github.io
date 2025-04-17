@@ -1,0 +1,37 @@
+---
+export interface Props {
+  title?: string;
+  class?: string;
+  titleClass?: string;
+  showSeeAll?: boolean;
+  seeAllHref?: string;
+  seeAllText?: string;
+}
+
+const {
+  title,
+  class: className = "",
+  titleClass = "text-2xl font-bold text-gray-900 dark:text-white",
+  showSeeAll = false,
+  seeAllHref = "#",
+  seeAllText = "See All",
+} = Astro.props;
+
+import Link from "./Link.astro";
+---
+
+<section class:list={["mx-auto mb-16 max-w-4xl", className]}>
+  {
+    title && (
+      <div class="flex justify-between items-end mb-8">
+        <div class="flex items-center">
+          <h2 class={titleClass}>{title}</h2>
+        </div>
+
+        {showSeeAll && <Link href={seeAllHref}>{seeAllText}</Link>}
+      </div>
+    )
+  }
+
+  <slot />
+</section>

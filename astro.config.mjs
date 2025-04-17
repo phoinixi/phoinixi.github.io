@@ -7,6 +7,9 @@ import mdx from "@astrojs/mdx";
 export default defineConfig({
   site: "https://phoinixi.github.io",
   integrations: [tailwind(), mdx()],
+  prefetch: {
+    prefetchAll: true,
+  },
 });
 
 // Helper function to generate slugs from titles (will be used in content configuration)

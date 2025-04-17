@@ -2,6 +2,7 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import { formatDate } from "../../utils/date";
+import GiscusComments from "../../components/blog/GiscusComments.astro";
 
 export async function getStaticPaths() {
   const blogEntries = await getCollection("blog");
@@ -66,6 +67,8 @@ const { Content } = await entry.render();
       <div class="prose prose-lg max-w-none dark:prose-invert">
         <Content />
       </div>
+
+      <GiscusComments />
     </article>
   </div>
 </Layout>

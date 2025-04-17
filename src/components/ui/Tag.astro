@@ -1,0 +1,21 @@
+---
+export interface Props {
+  text: string;
+  class?: string;
+  showHash?: boolean;
+}
+
+const { text, class: className = "", showHash = true } = Astro.props;
+
+const displayText = showHash ? `#${text}` : text;
+---
+
+<span
+  class:list={[
+    "px-2 py-1 text-xs text-gray-800 bg-gray-100 rounded-full dark:bg-gray-800 dark:text-gray-200",
+    className,
+  ]}
+>
+  {displayText}
+</span>
+

@@ -53,8 +53,49 @@
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "default": []
+          }
+        },
+        "relatedPosts": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "collection": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "collection"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "slug": {
+                    "type": "string"
+                  },
+                  "collection": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "slug",
+                  "collection"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
         },
         "$schema": {
           "type": "string"
@@ -63,7 +104,8 @@
       "required": [
         "title",
         "description",
-        "pubDate"
+        "pubDate",
+        "tags"
       ],
       "additionalProperties": false
     }

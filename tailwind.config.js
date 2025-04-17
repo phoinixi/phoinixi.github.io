@@ -23,8 +23,11 @@ export default {
           css: {
             a: {
               color: theme("colors.blue.600"),
+              textDecoration: "none",
+              transition: "opacity 150ms cubic-bezier(0.4, 0, 0.2, 1)",
               "&:hover": {
-                color: theme("colors.blue.700"),
+                opacity: 0.8,
+                color: theme("colors.blue.600"),
               },
             },
           },
@@ -34,8 +37,11 @@ export default {
             color: theme("colors.gray.300"),
             a: {
               color: theme("colors.blue.400"),
+              textDecoration: "none",
+              transition: "opacity 150ms cubic-bezier(0.4, 0, 0.2, 1)",
               "&:hover": {
-                color: theme("colors.blue.300"),
+                opacity: 0.8,
+                color: theme("colors.blue.400"),
               },
             },
             h1: {

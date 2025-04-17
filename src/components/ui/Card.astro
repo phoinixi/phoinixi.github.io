@@ -1,0 +1,28 @@
+---
+export interface Props {
+  url?: string;
+  class?: string;
+  target?: string;
+  rel?: string;
+}
+
+const {
+  url,
+  class: className = "",
+  target,
+  rel = target === "_blank" ? "noopener noreferrer" : undefined,
+} = Astro.props;
+
+const Tag = url ? "a" : "div";
+const attrs = url ? { href: url, target, rel } : {};
+---
+
+<Tag
+  {...attrs}
+  class:list={[
+    "block p-6 rounded-lg border border-gray-100 transition-shadow dark:border-gray-800 hover:shadow-md",
+    className,
+  ]}
+>
+  <slot />
+</Tag>
