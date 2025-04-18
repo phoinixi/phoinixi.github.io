@@ -46,7 +46,7 @@ const pageTitle = `Posts tagged with "${tag}"`;
   <PageLayout title={pageTitle}>
     <ul class="space-y-6">
       {
-        sortedPosts.map((post: CollectionEntry<"blog">) => (
+        sortedPosts.map((post) => (
           <li class="flex flex-col sm:flex-row gap-x-4">
             <div class="text-gray-500 dark:text-gray-400 text-sm w-full sm:w-28 flex-shrink-0 mb-1 sm:mb-0">
               {formatDate(post.data.pubDate)}
