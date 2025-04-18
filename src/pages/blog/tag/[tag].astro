@@ -4,12 +4,13 @@ import Layout from "../../../layouts/Layout.astro";
 import PageLayout from "../../../components/layout/PageLayout.astro";
 import { formatDate } from "../../../utils/date";
 
+// Define BlogPost type alias
+type BlogPost = CollectionEntry<"blog">;
+
 export async function getStaticPaths() {
   const allPosts = await getCollection("blog");
   const uniqueTags = [
-    ...new Set(
-      allPosts.flatMap((post: CollectionEntry<"blog">) => post.data.tags || [])
-    ),
+    ...new Set(allPosts.flatMap((post: BlogPost) => post.data.tags || [])), // Use BlogPost
   ];
 
   return uniqueTags.map((tag: string) => {
@@ -27,16 +28,20 @@ type Props = {
 const { tag } = Astro.params;
 const allPosts = await getCollection(
   "blog",
-  ({ data }: { data: CollectionEntry<"blog">["data"] }) => {
+  ({ data }: { data: BlogPost["data"] }) => {
+    // Use BlogPost
     // Filter posts that include the current tag
     return data.tags?.includes(tag);
   }
 );
 
 // Sort posts by date
-const sortedPosts = allPosts.sort(
-  (a: CollectionEntry<"blog">, b: CollectionEntry<"blog">) =>
-    new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf()
+const sortedPosts: BlogPost[] = allPosts.sort(
+  // Ensure sortedPosts is typed
+  (
+    a: BlogPost,
+    b: BlogPost // Use BlogPost
+  ) => new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf()
 );
 
 const pageTitle = `Posts tagged with "${tag}"`;
@@ -46,26 +51,30 @@ const pageTitle = `Posts tagged with "${tag}"`;
   <PageLayout title={pageTitle}>
     <ul class="space-y-6">
       {
-        sortedPosts.map((post) => (
-          <li class="flex flex-col sm:flex-row gap-x-4">
-            <div class="text-gray-500 dark:text-gray-400 text-sm w-full sm:w-28 flex-shrink-0 mb-1 sm:mb-0">
-              {formatDate(post.data.pubDate)}
-            </div>
-            <div class="flex-grow">
-              <a
-                href={`/blog/${post.slug}/`}
-                class="text-lg font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-              >
-                {post.data.title}
-              </a>
-              {post.data.description && (
-                <p class="mt-1 text-gray-600 dark:text-gray-300 text-sm">
-                  {post.data.description}
-                </p>
-              )}
-            </div>
-          </li>
-        ))
+        sortedPosts.map(
+          (
+            post: BlogPost // Use BlogPost
+          ) => (
+            <li class="flex flex-col gap-x-4 sm:flex-row">
+              <div class="flex-shrink-0 mb-1 w-full text-sm text-gray-500 dark:text-gray-400 sm:w-28 sm:mb-0">
+                {formatDate(post.data.pubDate)}
+              </div>
+              <div class="flex-grow">
+                <a
+                  href={`/blog/${post.slug}/`}
+                  class="text-lg font-medium text-gray-900 transition-colors dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
+                >
+                  {post.data.title}
+                </a>
+                {post.data.description && (
+                  <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                    {post.data.description}
+                  </p>
+                )}
+              </div>
+            </li>
+          )
+        )
       }
     </ul>
     {
