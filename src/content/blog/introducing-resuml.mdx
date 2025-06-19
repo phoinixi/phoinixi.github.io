@@ -1,0 +1,50 @@
+---
+title: "Introducing Resuml: YAML-powered Resume Builder"
+description: "Resuml is a CLI tool that lets you manage your resume as code in YAML, validate it, and export to JSON or HTML with beautiful themes."
+date: "2025-06-19"
+tags: ["resuml", "cli", "yaml", "resume", "open-source"]
+---
+
+# Introducing Resuml: YAML-powered Resume Builder
+
+[Resuml](https://github.com/phoinixi/resuml) is an open-source CLI tool that helps you manage your resume as code. Write your resume in YAML, validate it, and export to JSON or HTML using professional themes.
+
+## Key Features
+
+- **YAML-first**: Author your resume in a simple, human-readable YAML format.
+- **Validation**: Ensure your resume data is correct with built-in validation against the JSON Resume schema.
+- **Export Options**: Convert your YAML to JSON or render it as HTML using themes like Stack Overflow or React.
+- **Theme Support**: Choose from available themes for a professional look, or create your own.
+- **CLI & API**: Use Resuml from the command line or integrate it into Node.js projects.
+
+## Quick Start
+
+1. Install: `npm install -g resuml`
+2. Write your resume in `resume.yaml`
+3. Validate: `resuml validate --resume resume.yaml`
+4. Export to JSON: `resuml tojson --resume resume.yaml --output resume.json`
+5. Render HTML: `resuml render --resume resume.yaml --theme stackoverflow --output resume.html`
+
+## Example YAML
+
+```yaml
+basics:
+  name: John Doe
+  label: Software Engineer
+  email: john@example.com
+  summary: Experienced software engineer...
+  location:
+    city: San Francisco
+    countryCode: US
+  profiles:
+    - network: GitHub
+      url: https://github.com/johndoe
+```
+
+## Why Resuml?
+
+- Keep your resume versioned and editable as code
+- Easily switch between formats and themes
+- Open-source and privacy-friendly
+
+Find out more and contribute at [https://github.com/phoinixi/resuml](https://github.com/phoinixi/resuml)
