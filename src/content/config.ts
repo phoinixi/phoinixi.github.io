@@ -35,6 +35,7 @@ const projectsCollection = defineCollection({
     link: z.string().url(),
     year: z.string(),
     tags: z.array(z.string()),
+    draft: z.boolean().default(false),
     featured: z.boolean().default(false),
     relatedProjects: z.array(reference("projects")).optional(),
   }),

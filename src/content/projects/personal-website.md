@@ -5,6 +5,7 @@ link: "https://github.com/phoinixi/phoinixi.github.io"
 year: "2025"
 tags: ["astro", "tailwindcss", "typescript"]
 featured: false
+draft: true
 ---
 
 # Personal Website

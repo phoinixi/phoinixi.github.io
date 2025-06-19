@@ -32,4 +32,5 @@ export interface ProjectMeta {
   year: string;
   tags: string[];
   featured: boolean;
+  draft?: boolean;
 }

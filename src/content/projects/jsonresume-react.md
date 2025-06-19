@@ -4,7 +4,7 @@ description: "A modern, customizable React-based theme for JSON Resume with mult
 link: "https://github.com/phoinixi/jsonresume-theme-react"
 year: "2025"
 tags: ["react", "typescript", "resume", "tailwindcss"]
-featured: true
+featured: false
 ---
 
 # JSON Resume Theme: React

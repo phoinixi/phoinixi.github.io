@@ -24,7 +24,8 @@ const projects = allProjects.sort(
 type Project = CollectionEntry<"projects">;
 
 // Cast the projects to the correct type to avoid type errors in the template
-const typedProjects: Project[] = projects;
+console.log("Projects:", projects);
+const typedProjects: Project[] = projects.filter((project: Project) => !project.data.draft);
 
 // Helper function to render tags with proper typing
 function renderTags(tags: string[]) {
