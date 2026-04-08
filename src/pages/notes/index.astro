@@ -1,0 +1,49 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { formatDate } from "../../utils/date";
+import { getCollection, type CollectionEntry } from "astro:content";
+import Card from "../../components/ui/Card.astro";
+import Tag from "../../components/ui/Tag.astro";
+import PageLayout from "../../components/layout/PageLayout.astro";
+
+// Get all notes from the collection
+const notes = await getCollection("notes");
+
+// Sort by date (newest first)
+notes.sort(
+  (a: CollectionEntry<"notes">, b: CollectionEntry<"notes">) =>
+    b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+type Note = CollectionEntry<"notes">;
+const typedNotes: Note[] = notes;
+---
+
+<Layout title="Notes | Francesco Esposito">
+  <PageLayout
+    title="Notes"
+    description="Short tips, TILs, and things I've picked up along the way."
+  >
+    <div class="flex flex-col gap-8">
+      {
+        typedNotes.map((note) => (
+          <Card url={`/notes/${note.slug}`}>
+            <h2 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">
+              {note.data.title}
+            </h2>
+            <div class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+              {formatDate(note.data.date)}
+            </div>
+            {note.data.tags.length > 0 && (
+              <div class="flex flex-wrap gap-2">
+                {note.data.tags.map((tag: string) => (
+                  <Tag text={tag} />
+                ))}
+              </div>
+            )}
+          </Card>
+        ))
+      }
+    </div>
+  </PageLayout>
+</Layout>

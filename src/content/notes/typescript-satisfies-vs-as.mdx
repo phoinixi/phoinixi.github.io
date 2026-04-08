@@ -1,0 +1,27 @@
+---
+title: "TypeScript: satisfies vs as"
+date: 2025-04-08
+tags: ["typescript", "frontend"]
+---
+
+Use `satisfies` when you want to validate a value matches a type **without widening it**. Use `as` when you need to override the compiler.
+
+```typescript
+// `as` loses the literal types
+const routes = {
+  home: "/",
+  about: "/about",
+} as Record<string, string>;
+
+routes.home; // string — literal "/" is lost
+
+// `satisfies` keeps them
+const routes = {
+  home: "/",
+  about: "/about",
+} satisfies Record<string, string>;
+
+routes.home; // "/" — literal type preserved
+```
+
+The rule of thumb: reach for `satisfies` first. Only use `as` when you genuinely know more than the compiler.

@@ -1,0 +1,25 @@
+---
+title: "Container queries: responsive components, not pages"
+date: 2025-04-04
+tags: ["css", "frontend"]
+---
+
+Media queries respond to the **viewport**. Container queries respond to the **parent element**. This makes components truly reusable regardless of where they're placed.
+
+```css
+.card-wrapper {
+  container-type: inline-size;
+  container-name: card;
+}
+
+@container card (min-width: 400px) {
+  .card {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+  }
+}
+```
+
+The same card component switches from stacked to side-by-side layout based on its container width, not the screen width. Drop it in a sidebar or a full-width section — it adapts automatically.
+
+Browser support is solid across all modern browsers since early 2023.

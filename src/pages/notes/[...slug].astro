@@ -1,0 +1,50 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import PageLayout from "../../components/layout/PageLayout.astro";
+import { formatDate } from "../../utils/date";
+
+export async function getStaticPaths() {
+  const notes = await getCollection("notes");
+  return notes.map((entry: CollectionEntry<"notes">) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+type Props = {
+  entry: CollectionEntry<"notes">;
+};
+
+const { entry } = Astro.props as Props;
+const { Content } = await entry.render();
+const { title, date, tags } = entry.data;
+---
+
+<Layout title={title}>
+  <PageLayout title={title}>
+    <div class="mb-6">
+      <div class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+        {formatDate(date)}
+      </div>
+      {
+        tags && tags.length > 0 && (
+          <div class="flex flex-wrap gap-2">
+            {tags.map((tag: string) => (
+              <a
+                href={`/blog/tag/${tag}`}
+                class="px-3 py-1 text-sm text-gray-800 bg-gray-100 rounded-full transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+              >
+                #{tag}
+              </a>
+            ))}
+          </div>
+        )
+      }
+    </div>
+
+    <div class="prose dark:prose-invert max-w-none">
+      <Content />
+    </div>
+  </PageLayout>
+</Layout>

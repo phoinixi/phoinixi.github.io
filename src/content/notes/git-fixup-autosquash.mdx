@@ -1,0 +1,26 @@
+---
+title: "Clean git history with fixup and autosquash"
+date: 2025-04-06
+tags: ["git", "productivity"]
+---
+
+When you spot something to fix in an earlier commit, don't just commit with "fix typo". Use `--fixup` to tie it to the original commit:
+
+```bash
+# Find the commit to fix
+git log --oneline
+
+# Create a fixup commit targeting that SHA
+git commit --fixup <sha>
+
+# Before pushing, squash them together
+git rebase -i --autosquash main
+```
+
+Git will automatically reorder and mark the fixup commit for squashing. Your history stays clean, and reviewers see coherent commits instead of a trail of corrections.
+
+You can also set autosquash as the default:
+
+```bash
+git config --global rebase.autosquash true
+```
