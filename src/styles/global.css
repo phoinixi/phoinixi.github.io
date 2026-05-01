@@ -40,6 +40,8 @@ body {
   background: var(--bg);
   color: var(--ink);
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   position: relative;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
