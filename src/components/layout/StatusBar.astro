@@ -38,30 +38,26 @@ const latestTitle = latest ? (latest.data.title.length > 36 ? latest.data.title.
   </div>
   <div class="t-stat-cell">
     <span class="t-stat-led t-led-green" id="t-here-led"></span>
-    <span class="t-stat-k">Zurich</span>
-    <span class="t-stat-v" id="t-here-time">--:--</span>
+    <span class="t-stat-k">LOC</span>
+    <span class="t-stat-v">Zurich</span>
     <span class="t-stat-aux" id="t-here-aux">AT KEYBOARD</span>
   </div>
 </aside>
 
 <script is:inline>
   (function () {
-    const time = document.getElementById("t-here-time");
     const aux = document.getElementById("t-here-aux");
     const led = document.getElementById("t-here-led");
-    if (!time) return;
+    if (!aux || !led) return;
     const tick = () => {
-      const d = new Date();
-      const h = d.getHours();
-      const p = (n) => String(n).padStart(2, "0");
-      time.textContent = p(h) + ":" + p(d.getMinutes());
+      const h = new Date().getHours();
       const working = h >= 9 && h < 19;
       aux.textContent = working ? "AT KEYBOARD" : "AWAY";
       led.classList.toggle("t-led-green", working);
       led.classList.toggle("t-led-dim", !working);
     };
     tick();
-    setInterval(tick, 30000);
+    setInterval(tick, 60000);
   })();
 </script>
 
