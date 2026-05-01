@@ -59,5 +59,6 @@ const dateStr = new Date(date).toISOString().slice(0, 10);
   .t-note-body :global(a:hover) { color: var(--accent); border-bottom-color: var(--accent); }
   .t-note-body :global(code) { font-family: var(--mono); color: var(--accent); background: var(--bg-2); border: 1px solid var(--line); padding: 1px 5px; }
   .t-note-body :global(pre) { background: var(--bg-2); border: 1px solid var(--line); }
+  .t-note-body :global(pre code) { color: var(--ink); border: 0; background: transparent; padding: 0; }
   .t-note-foot { margin-top: 48px; padding-top: 18px; border-top: 1px dashed var(--line); }
 </style>

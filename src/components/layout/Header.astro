@@ -53,6 +53,8 @@ const tabs = HEADER_LINKS.map((l, i) => ({ ...l, num: String(i + 1).padStart(2, 
     border-bottom: 1px solid var(--line);
   }
   .t-topbar-l { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .t-topbar-l > * { flex-shrink: 0; }
+  .t-topbar-l .t-path { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .t-topbar-r { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
   .t-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 12px var(--accent); flex-shrink: 0; }
   .t-tabs { display: flex; gap: 0; border: 1px solid var(--line); }
