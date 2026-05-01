@@ -1,30 +1,15 @@
 ---
-import { SITE_TITLE } from "../../consts";
-import SocialLinks from "../ui/SocialLinks.astro";
-import { getEntry } from "astro:content";
-
-interface Props {
-  hideSidebarContent?: boolean;
-}
-
-// Get footer content from content collection
-const footerContent = await getEntry("pages", "footer");
-const { Content } = await footerContent.render();
-
-const { hideSidebarContent = false } = Astro.props;
-const year = new Date().getFullYear();
+import { GITHUB_URL, EMAIL } from "../../consts";
 ---
-
-<footer class="py-8 mt-auto border-t border-gray-200 dark:border-gray-800">
-  <div class="container px-6 mx-auto max-w-4xl">
-    <div class="flex flex-col items-center text-center">
-      <SocialLinks variant="icons" size="sm" className="mb-4" />
-
-      <div
-        class="prose prose-sm dark:prose-invert text-gray-600 dark:text-gray-400"
-      >
-        <Content />
-      </div>
-    </div>
-  </div>
+<footer class="t-foot">
+  <span class="t-mono-sm t-dim">© 2026 — Francesco Esposito</span>
+  <span class="t-mono-sm t-dim">no cookies · no tracking · no ads</span>
+  <span class="t-mono-sm t-dim">
+    <a href={GITHUB_URL} class="t-link">github</a>
+    <span class="t-sep">·</span>
+    <a href={`mailto:${EMAIL}`} class="t-link">{EMAIL}</a>
+  </span>
 </footer>
+<style>
+  .t-foot { display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; padding: 22px 24px; max-width: 1280px; margin: 24px auto 0; border-top: 1px solid var(--line); }
+</style>

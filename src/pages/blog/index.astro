@@ -1,57 +1,76 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { formatDate } from "../../utils/date";
 import { getCollection, type CollectionEntry } from "astro:content";
-import Card from "../../components/ui/Card.astro";
-import Tag from "../../components/ui/Tag.astro";
-import PageLayout from "../../components/layout/PageLayout.astro";
-
-// Get all blog posts from the collection
-const posts = await getCollection("blog");
-
-// Sort by publication date (newest first)
-posts.sort(
-  (a: CollectionEntry<"blog">, b: CollectionEntry<"blog">) =>
-    b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-);
-
-// Get unique tags across all posts
-const allTags = [
-  ...new Set(
-    posts.flatMap((post: CollectionEntry<"blog">) => post.data.tags || [])
-  ),
-].sort();
 
 type BlogPost = CollectionEntry<"blog">;
-const typedPosts: BlogPost[] = posts;
+
+const posts = (await getCollection("blog")).sort(
+  (a: BlogPost, b: BlogPost) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const groups = new Map<string, BlogPost[]>();
+for (const p of posts) {
+  const y = String(p.data.pubDate.getFullYear());
+  if (!groups.has(y)) groups.set(y, []);
+  groups.get(y)!.push(p);
+}
+const years = [...groups.keys()];
 ---
 
 <Layout title="Blog | Francesco Esposito">
-  <PageLayout
-    title="Blog"
-    description="My thoughts and tutorials on web development, frontend technologies, and software engineering."
-  >
-    <div class="flex flex-col gap-8">
-      {
-        typedPosts.map((post) => (
-          <Card url={`/blog/${post.slug}`}>
-            <h2 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">
-              {post.data.title}
-            </h2>
-            <div class="mb-2 text-sm text-gray-500 dark:text-gray-400">
-              {formatDate(post.data.pubDate)}
-            </div>
-            <p class="mb-4 text-gray-600 dark:text-gray-300">
-              {post.data.description}
-            </p>
-            <div class="flex flex-wrap gap-2">
-              {post.data.tags.map((tag: string) => (
-                <Tag text={tag} />
-              ))}
-            </div>
-          </Card>
-        ))
-      }
-    </div>
-  </PageLayout>
+  <section class="t-page">
+    <header class="t-section-head">
+      <span class="t-section-num">/01</span>
+      <h1 class="t-section-title">ARCHIVE</h1>
+      <span class="t-mono-sm t-dim">writing, sorted by date</span>
+      <span class="t-spacer"></span>
+      <span class="t-mono-sm t-dim">{posts.length} entries</span>
+    </header>
+
+    {years.map((year) => (
+      <div class="t-year">
+        <div class="t-year-head">
+          <span class="t-mono-sm t-dim">/{year}</span>
+          <span class="t-year-rule"></span>
+          <span class="t-mono-sm t-dim">{groups.get(year)!.length}</span>
+        </div>
+        <ul class="t-list">
+          {groups.get(year)!.map((post) => {
+            const date = post.data.pubDate.toISOString().slice(5, 10);
+            const tag = post.data.tags?.[0];
+            return (
+              <li class="t-list-row">
+                <a href={`/blog/${post.slug}`} class="t-list-link">
+                  <span class="t-mono-sm t-dim t-list-date">{date}</span>
+                  <span class="t-list-title">{post.data.title}</span>
+                  <span class="t-spacer"></span>
+                  {tag && <span class="t-mono-sm t-tag-sm">#{tag}</span>}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    ))}
+  </section>
 </Layout>
+
+<style>
+  .t-page { padding: 24px 0 56px; }
+  .t-year { margin-top: 40px; }
+  .t-year:first-of-type { margin-top: 24px; }
+  .t-year-head { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+  .t-year-rule { flex: 1; height: 0; border-top: 1px dashed var(--line); }
+  .t-list { list-style: none; margin: 0; padding: 0; }
+  .t-list-row { border-bottom: 1px solid var(--line); }
+  .t-list-link { display: flex; align-items: baseline; gap: 14px; padding: 12px 0; text-decoration: none; color: inherit; transition: padding .15s, background .15s; }
+  .t-list-link:hover { padding-left: 8px; background: linear-gradient(90deg, rgba(216,255,62,0.05), transparent 30%); }
+  .t-list-date { width: 56px; flex-shrink: 0; color: var(--dim); }
+  .t-list-title { font-family: var(--serif); font-size: 19px; color: var(--ink); }
+  .t-tag-sm { font-family: var(--mono); font-size: 10px; color: var(--accent); letter-spacing: 0.06em; text-transform: lowercase; padding: 1px 6px; border: 1px solid var(--line-2); }
+
+  @media (max-width: 640px) {
+    .t-list-date { width: 48px; }
+    .t-list-title { font-size: 17px; }
+  }
+</style>

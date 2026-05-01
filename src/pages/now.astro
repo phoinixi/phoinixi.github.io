@@ -1,0 +1,53 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getEntry } from "astro:content";
+
+const nowPage = await getEntry("pages", "now");
+const { Content } = await nowPage.render();
+const updated = nowPage.data.updatedDate
+  ? new Date(nowPage.data.updatedDate).toISOString().slice(0, 10)
+  : null;
+---
+
+<Layout title="Now | Francesco Esposito" description="What I'm currently working on.">
+  <section class="t-page">
+    <header class="t-section-head">
+      <span class="t-section-num">/01</span>
+      <h1 class="t-section-title">NOW</h1>
+      <span class="t-mono-sm t-dim">what's running this week</span>
+      <span class="t-spacer"></span>
+      {updated && (
+        <span class="t-mono-sm t-dim">last updated: {updated}</span>
+      )}
+    </header>
+
+    <article class="t-now-body prose prose-lg">
+      <Content />
+    </article>
+
+    <footer class="t-now-foot">
+      <span class="t-mono-sm t-dim">// inspired by</span>
+      <a href="https://nownownow.com/about" class="t-mono-sm t-link" target="_blank" rel="noopener">nownownow.com</a>
+    </footer>
+  </section>
+</Layout>
+
+<style>
+  .t-page { padding: 24px 0 56px; max-width: 72ch; }
+  .t-now-body :global(h2) {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent); border-top: 1px solid var(--line);
+    padding-top: 24px; margin-top: 48px; margin-bottom: 16px; font-weight: 500;
+  }
+  .t-now-body :global(h2:first-child) { border-top: 0; padding-top: 0; margin-top: 24px; }
+  .t-now-body :global(p) { font-family: var(--serif); font-size: 19px; line-height: 1.55; color: var(--ink-2); }
+  .t-now-body :global(ul) { font-family: var(--serif); font-size: 19px; line-height: 1.55; color: var(--ink-2); padding-left: 0; list-style: none; }
+  .t-now-body :global(li) { padding-left: 18px; position: relative; margin: 8px 0; }
+  .t-now-body :global(li::before) { content: "▸"; position: absolute; left: 0; color: var(--accent); font-family: var(--mono); font-size: 12px; top: 4px; }
+  .t-now-body :global(a) { color: var(--ink); border-bottom: 1px dashed var(--line-2); text-decoration: none; }
+  .t-now-body :global(a:hover) { color: var(--accent); border-bottom-color: var(--accent); }
+  .t-now-body :global(code) { font-family: var(--mono); color: var(--accent); background: var(--bg-2); border: 1px solid var(--line); padding: 1px 5px; }
+
+  .t-now-foot { margin-top: 56px; padding-top: 18px; border-top: 1px dashed var(--line); display: flex; align-items: center; gap: 8px; }
+</style>

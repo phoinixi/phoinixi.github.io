@@ -1,88 +1,68 @@
 ---
 import { getCollection, type CollectionEntry } from "astro:content";
 import Layout from "../../../layouts/Layout.astro";
-import PageLayout from "../../../components/layout/PageLayout.astro";
-import { formatDate } from "../../../utils/date";
 
-// Define BlogPost type alias
 type BlogPost = CollectionEntry<"blog">;
 
 export async function getStaticPaths() {
   const allPosts = await getCollection("blog");
   const uniqueTags = [
-    ...new Set(allPosts.flatMap((post: BlogPost) => post.data.tags || [])), // Use BlogPost
+    ...new Set(allPosts.flatMap((post: BlogPost) => post.data.tags || [])),
   ];
-
-  return uniqueTags.map((tag: string) => {
-    return {
-      params: { tag: tag },
-      props: { tag },
-    };
-  });
+  return uniqueTags.map((tag: string) => ({
+    params: { tag },
+    props: { tag },
+  }));
 }
 
-type Props = {
-  tag: string;
-};
-
 const { tag } = Astro.params;
-const allPosts = await getCollection(
-  "blog",
-  ({ data }: { data: BlogPost["data"] }) => {
-    // Use BlogPost
-    // Filter posts that include the current tag
-    return data.tags?.includes(tag);
-  }
+const allPosts = await getCollection("blog", ({ data }: { data: BlogPost["data"] }) =>
+  data.tags?.includes(tag as string)
 );
 
-// Sort posts by date
 const sortedPosts: BlogPost[] = allPosts.sort(
-  // Ensure sortedPosts is typed
-  (
-    a: BlogPost,
-    b: BlogPost // Use BlogPost
-  ) => new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf()
+  (a: BlogPost, b: BlogPost) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
 
 const pageTitle = `Posts tagged with "${tag}"`;
 ---
 
 <Layout title={pageTitle}>
-  <PageLayout title={pageTitle}>
-    <ul class="space-y-6">
-      {
-        sortedPosts.map(
-          (
-            post: BlogPost // Use BlogPost
-          ) => (
-            <li class="flex flex-col gap-x-4 sm:flex-row">
-              <div class="flex-shrink-0 mb-1 w-full text-sm text-gray-500 dark:text-gray-400 sm:w-28 sm:mb-0">
-                {formatDate(post.data.pubDate)}
-              </div>
-              <div class="flex-grow">
-                <a
-                  href={`/blog/${post.slug}/`}
-                  class="text-lg font-medium text-gray-900 transition-colors dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
-                >
-                  {post.data.title}
-                </a>
-                {post.data.description && (
-                  <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
-                    {post.data.description}
-                  </p>
-                )}
-              </div>
+  <section class="t-page">
+    <header class="t-section-head">
+      <span class="t-section-num">/01</span>
+      <h1 class="t-section-title">TAG · {tag}</h1>
+      <span class="t-spacer"></span>
+      <a href="/blog" class="t-mono-sm t-link">← all posts</a>
+    </header>
+
+    {sortedPosts.length === 0 ? (
+      <p class="t-empty">No posts found for this tag.</p>
+    ) : (
+      <ul class="t-list">
+        {sortedPosts.map((post: BlogPost) => {
+          const date = post.data.pubDate.toISOString().slice(0, 10);
+          return (
+            <li class="t-list-row">
+              <a href={`/blog/${post.slug}/`} class="t-list-link">
+                <span class="t-mono-sm t-dim t-list-date">{date}</span>
+                <span class="t-list-title">{post.data.title}</span>
+              </a>
             </li>
-          )
-        )
-      }
-    </ul>
-    {
-      sortedPosts.length === 0 && (
-        <p class="text-center text-gray-500 dark:text-gray-400">
-          No posts found for this tag.
-        </p>
-      )
-    }
-  </PageLayout>
+          );
+        })}
+      </ul>
+    )}
+  </section>
 </Layout>
+
+<style>
+  .t-page { padding: 24px 0 56px; }
+  .t-list { list-style: none; margin: 0; padding: 0; }
+  .t-list-row { border-bottom: 1px solid var(--line); }
+  .t-list-link { display: flex; align-items: baseline; gap: 14px; padding: 12px 0; text-decoration: none; color: inherit; transition: padding .15s, background .15s; }
+  .t-list-link:hover { padding-left: 8px; background: linear-gradient(90deg, rgba(216,255,62,0.05), transparent 30%); }
+  .t-list-date { width: 92px; flex-shrink: 0; color: var(--dim); }
+  .t-list-title { font-family: var(--serif); font-size: 19px; color: var(--ink); }
+  .t-empty { font-family: var(--serif); color: var(--ink-2); margin-top: 24px; }
+</style>

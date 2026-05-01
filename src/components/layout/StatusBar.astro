@@ -1,0 +1,116 @@
+---
+// src/components/layout/StatusBar.astro
+import { getCollection, getEntry } from "astro:content";
+
+let focus = "Available for new work";
+try {
+  const now = await getEntry("pages", "now");
+  const body = (now?.body || "").trim();
+  const firstLine = body.split("\n").find((l) => l && !l.startsWith("#") && !l.startsWith("---"));
+  if (firstLine) focus = firstLine.replace(/^[-*]\s*/, "").trim();
+} catch (e) {}
+
+const posts = await getCollection("blog");
+const latest = posts.sort((a, b) => +b.data.pubDate - +a.data.pubDate)[0];
+const daysAgo = latest ? Math.max(1, Math.floor((Date.now() - +latest.data.pubDate) / 86400000)) : 0;
+const rel = daysAgo < 30 ? `${daysAgo}d ago` : daysAgo < 365 ? `${Math.floor(daysAgo/30)}mo ago` : `${Math.floor(daysAgo/365)}y ago`;
+const latestTitle = latest ? (latest.data.title.length > 36 ? latest.data.title.slice(0, 34) + "…" : latest.data.title) : "—";
+
+const projects = (await getCollection("projects")).filter((p) => !p.data.draft);
+const reposCount = projects.length;
+const fresh = projects.sort((a, b) => Number(b.data.year) - Number(a.data.year))[0];
+const freshTitle = fresh ? fresh.data.title : "";
+---
+
+<aside class="t-statusbar" aria-label="Status">
+  <div class="t-stat-cell">
+    <span class="t-stat-led t-led-green is-pulse"></span>
+    <span class="t-stat-k">FOCUS</span>
+    <span class="t-stat-v">{focus}</span>
+  </div>
+  <div class="t-stat-cell">
+    <span class="t-stat-led t-led-amber"></span>
+    <span class="t-stat-k">LATEST</span>
+    <span class="t-stat-v">
+      {latest ? <a href={`/blog/${latest.slug}`} class="t-stat-link">{latestTitle}</a> : "—"}
+    </span>
+    {latest && <span class="t-stat-aux">{rel}</span>}
+  </div>
+  <div class="t-stat-cell">
+    <span class="t-stat-k">REPOS</span>
+    <span class="t-stat-v">{reposCount} ACTIVE</span>
+    {freshTitle && <span class="t-stat-aux">fresh: {freshTitle}</span>}
+  </div>
+  <div class="t-stat-cell">
+    <span class="t-stat-led t-led-green"></span>
+    <span class="t-stat-k">MENTOR</span>
+    <a href="https://mentorcruise.com/mentor/francescoesposito/" class="t-stat-v t-stat-link">SLOTS OPEN</a>
+    <span class="t-stat-aux">via mentorcruise</span>
+  </div>
+  <div class="t-stat-cell">
+    <span class="t-stat-led t-led-green" id="t-here-led"></span>
+    <span class="t-stat-k">BERLIN</span>
+    <span class="t-stat-v" id="t-here-time">--:--</span>
+    <span class="t-stat-aux" id="t-here-aux">AT KEYBOARD</span>
+  </div>
+</aside>
+
+<script is:inline>
+  (function () {
+    const time = document.getElementById("t-here-time");
+    const aux = document.getElementById("t-here-aux");
+    const led = document.getElementById("t-here-led");
+    if (!time) return;
+    const tick = () => {
+      const d = new Date();
+      const h = d.getHours();
+      const p = (n) => String(n).padStart(2, "0");
+      time.textContent = p(h) + ":" + p(d.getMinutes());
+      const working = h >= 9 && h < 19;
+      aux.textContent = working ? "AT KEYBOARD" : "AWAY";
+      led.classList.toggle("t-led-green", working);
+      led.classList.toggle("t-led-dim", !working);
+    };
+    tick();
+    setInterval(tick, 30000);
+  })();
+</script>
+
+<style>
+  .t-statusbar {
+    position: sticky; top: 49px; z-index: 40;
+    display: grid; grid-template-columns: 1.4fr 1.6fr 1.2fr 1.2fr 1fr;
+    align-items: stretch;
+    border-bottom: 1px solid var(--line);
+    background: var(--bg-2);
+  }
+  .t-stat-cell {
+    position: relative;
+    display: flex; align-items: baseline; gap: 8px;
+    padding: 9px 16px; border-right: 1px solid var(--line);
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em;
+    min-width: 0; overflow: hidden; transition: background .15s;
+  }
+  .t-stat-cell:hover { background: rgba(216,255,62,0.04); }
+  .t-stat-cell:last-child { border-right: 0; }
+  .t-stat-led { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--dim); flex-shrink: 0; }
+  .t-led-green { background: var(--accent); box-shadow: 0 0 8px rgba(216,255,62,0.6); }
+  .t-led-amber { background: var(--accent-2); box-shadow: 0 0 8px rgba(255,94,58,0.5); }
+  .t-led-dim { background: var(--dim); }
+  .t-stat-led.is-pulse { animation: t-led-pulse 2.4s ease-in-out infinite; }
+  @keyframes t-led-pulse { 50% { opacity: 0.4; } }
+  .t-stat-k { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); flex-shrink: 0; }
+  .t-stat-v { color: var(--ink); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .t-stat-link { color: var(--ink); text-decoration: none; border-bottom: 1px dashed transparent; }
+  .t-stat-link:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .t-stat-aux { font-size: 10px; color: var(--dim); letter-spacing: 0.06em; text-transform: uppercase; flex-shrink: 0; margin-left: auto; }
+  @media (max-width: 1100px) {
+    .t-statusbar { grid-template-columns: 1fr 1fr; }
+    .t-stat-cell:nth-child(n+5) { display: none; }
+  }
+  @media (max-width: 640px) {
+    .t-statusbar { grid-template-columns: 1fr; }
+    .t-stat-cell { border-bottom: 1px solid var(--line); border-right: 0; }
+    .t-stat-cell:nth-child(n+3) { display: none; }
+  }
+</style>

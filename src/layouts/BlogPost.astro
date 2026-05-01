@@ -1,20 +1,24 @@
 ---
 import Layout from "./Layout.astro";
-import PageLayout from "../components/layout/PageLayout.astro";
-import { formatDate } from "../utils/date";
+import GiscusComments from "../components/blog/GiscusComments.astro";
 
-export interface Props {
-  content: {
-    title: string;
-    description: string;
-    pubDate: string | Date;
-    updatedDate?: string | Date;
-    heroImage?: string;
-    tags?: string[];
-  };
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
 }
 
-const { content } = Astro.props;
+export interface Props {
+  title: string;
+  description?: string;
+  pubDate: string | Date;
+  updatedDate?: string | Date;
+  heroImage?: string;
+  tags?: string[];
+  readingTime?: number;
+  headings?: Heading[];
+}
+
 const {
   title,
   description,
@@ -22,45 +26,170 @@ const {
   updatedDate,
   heroImage,
   tags = [],
-} = content;
+  readingTime,
+  headings = [],
+} = Astro.props;
+
+const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const dateStr = new Date(pubDate).toISOString().slice(0, 10);
+const updatedStr = updatedDate ? new Date(updatedDate).toISOString().slice(0, 10) : null;
 ---
 
 <Layout title={title} description={description}>
-  <PageLayout title={title} description={description}>
-    <div class="mb-10 text-center">
-      <div class="mb-2 text-gray-500">
-        {formatDate(pubDate)}
-        {
-          updatedDate && (
-            <span class="ml-2">(Updated: {formatDate(updatedDate)})</span>
-          )
-        }
-      </div>
-      {
-        heroImage && (
-          <img
-            src={heroImage}
-            alt={title}
-            class="mb-6 w-full h-auto rounded-lg max-w-3xl mx-auto"
-          />
-        )
-      }
-      {
-        tags.length > 0 && (
-          <div class="flex flex-wrap justify-center gap-2 mt-4">
-            {tags.map((tag) => (
-              <a
-                href={`/blog/tag/${tag}`}
-                class="px-3 py-1 text-sm text-gray-800 bg-gray-100 rounded-full transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-              >
-                #{tag}
-              </a>
-            ))}
+  <article class="t-post">
+    <div class="t-post-grid">
+      <div class="t-post-main">
+        <header class="t-post-head">
+          <div class="t-post-meta">
+            <span class="t-mono-sm t-dim">/post</span>
+            <span class="t-sep">·</span>
+            <time class="t-mono-sm t-dim" datetime={new Date(pubDate).toISOString()}>{dateStr}</time>
+            {readingTime && (
+              <>
+                <span class="t-sep">·</span>
+                <span class="t-mono-sm t-dim">{readingTime} min read</span>
+              </>
+            )}
+            {updatedStr && (
+              <>
+                <span class="t-sep">·</span>
+                <span class="t-mono-sm t-dim">updated {updatedStr}</span>
+              </>
+            )}
           </div>
-        )
-      }
-    </div>
+          <h1 class="t-post-title">{title}</h1>
+          {description && <p class="t-post-lede">{description}</p>}
+          {tags.length > 0 && (
+            <div class="t-post-tags">
+              {tags.map((tag) => (
+                <a href={`/blog/tag/${tag}`} class="t-pill">#{tag}</a>
+              ))}
+            </div>
+          )}
+        </header>
 
-    <slot />
-  </PageLayout>
+        {heroImage && (
+          <figure class="t-post-hero">
+            <img src={heroImage} alt={title} />
+          </figure>
+        )}
+
+        <div class="t-post-body prose prose-lg">
+          <slot />
+        </div>
+
+        <GiscusComments />
+      </div>
+
+      <aside class="t-toc-rail">
+        <div class="t-toc-section">
+          <div class="t-mono-sm t-dim t-toc-label">// post.meta</div>
+          <dl class="t-toc-meta">
+            <div class="t-toc-row">
+              <dt class="t-mono-sm t-dim">published</dt>
+              <dd class="t-mono-sm">{dateStr}</dd>
+            </div>
+            {updatedStr && (
+              <div class="t-toc-row">
+                <dt class="t-mono-sm t-dim">updated</dt>
+                <dd class="t-mono-sm">{updatedStr}</dd>
+              </div>
+            )}
+            {readingTime && (
+              <div class="t-toc-row">
+                <dt class="t-mono-sm t-dim">reading</dt>
+                <dd class="t-mono-sm">{readingTime} min</dd>
+              </div>
+            )}
+          </dl>
+          {tags.length > 0 && (
+            <div class="t-toc-tags">
+              {tags.map((tag) => (
+                <a href={`/blog/tag/${tag}`} class="t-pill">#{tag}</a>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {tocHeadings.length > 0 && (
+          <nav class="t-toc-section">
+            <div class="t-mono-sm t-dim t-toc-label">// in.this.article</div>
+            <ul class="t-toc-list">
+              {tocHeadings.map((h) => (
+                <li class={`t-toc-item depth-${h.depth}`}>
+                  <a href={`#${h.slug}`} class="t-toc-link">{h.text}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
+      </aside>
+    </div>
+  </article>
 </Layout>
+
+<style>
+  .t-post { padding: 24px 0 56px; }
+  .t-post-grid { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 56px; align-items: start; }
+  .t-post-main { min-width: 0; }
+
+  .t-post-head { margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+  .t-post-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .t-post-title {
+    font-family: var(--serif); font-weight: 400;
+    font-size: clamp(40px, 5.5vw, 56px);
+    line-height: 1.05; letter-spacing: -0.02em;
+    color: var(--ink); margin: 0;
+  }
+  .t-post-lede { font-family: var(--serif); font-size: 20px; line-height: 1.5; color: var(--ink-2); max-width: 64ch; margin: 16px 0 0; }
+  .t-post-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 18px; }
+  .t-post-tags a { text-decoration: none; }
+
+  .t-post-hero { margin: 0 0 32px; border: 1px solid var(--line); }
+  .t-post-hero img { display: block; width: 100%; height: auto; }
+
+  .t-post-body { max-width: 72ch; }
+  .t-post-body :global(h2) { font-family: var(--serif); font-weight: 400; font-size: 28px; letter-spacing: -0.01em; color: var(--ink); margin-top: 48px; }
+  .t-post-body :global(h3) { font-family: var(--serif); font-weight: 400; font-size: 22px; color: var(--ink); margin-top: 32px; }
+  .t-post-body :global(p) { font-family: var(--serif); font-size: 18px; line-height: 1.65; color: var(--ink-2); }
+  .t-post-body :global(a) { color: var(--ink); border-bottom: 1px dashed var(--line-2); text-decoration: none; }
+  .t-post-body :global(a:hover) { color: var(--accent); border-bottom-color: var(--accent); }
+  .t-post-body :global(code) { font-family: var(--mono); color: var(--accent); background: var(--bg-2); border: 1px solid var(--line); padding: 1px 5px; }
+  .t-post-body :global(pre) { background: var(--bg-2); border: 1px solid var(--line); border-radius: 0; }
+  .t-post-body :global(pre code) { color: var(--ink); border: 0; background: transparent; padding: 0; }
+  .t-post-body :global(blockquote) { color: var(--ink-2); border-left: 2px solid var(--accent); padding-left: 16px; font-style: italic; }
+  .t-post-body :global(hr) { border-top: 1px dashed var(--line); border-bottom: 0; }
+  .t-post-body :global(img) { border: 1px solid var(--line); }
+
+  .t-toc-rail {
+    position: sticky; top: 110px;
+    border-left: 1px dashed var(--line-2);
+    padding-left: 18px;
+    display: flex; flex-direction: column; gap: 28px;
+    max-height: calc(100vh - 130px);
+    overflow-y: auto;
+  }
+  .t-toc-label { display: block; margin-bottom: 10px; color: var(--accent); }
+  .t-toc-section + .t-toc-section { padding-top: 18px; border-top: 1px dashed var(--line); }
+  .t-toc-meta { margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .t-toc-row { display: flex; justify-content: space-between; gap: 12px; }
+  .t-toc-row dt, .t-toc-row dd { margin: 0; }
+  .t-toc-row dd { color: var(--ink); }
+  .t-toc-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 12px; }
+  .t-toc-tags a { text-decoration: none; }
+
+  .t-toc-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+  .t-toc-item.depth-3 { padding-left: 14px; }
+  .t-toc-link {
+    display: block;
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.03em;
+    color: var(--ink-2); text-decoration: none; line-height: 1.4;
+    padding: 2px 0; transition: color .15s;
+  }
+  .t-toc-link:hover { color: var(--accent); }
+
+  @media (max-width: 1024px) {
+    .t-post-grid { grid-template-columns: 1fr; gap: 32px; }
+    .t-toc-rail { position: static; max-height: none; border-left: 0; padding-left: 0; padding-top: 24px; border-top: 1px dashed var(--line-2); }
+  }
+</style>

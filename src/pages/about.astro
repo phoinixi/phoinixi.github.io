@@ -1,17 +1,90 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import PageLayout from "../components/layout/PageLayout.astro";
 import { getEntry } from "astro:content";
 
-// Get the about page content from the pages collection
 const aboutPage = await getEntry("pages", "about");
 const { Content } = await aboutPage.render();
+const updated = aboutPage.data.updatedDate
+  ? new Date(aboutPage.data.updatedDate).toISOString().slice(0, 10)
+  : null;
 ---
 
 <Layout title="About | Francesco Esposito">
-  <PageLayout title="About Me">
-    <div class="mb-12 space-y-6 max-w-none prose prose-lg dark:prose-invert">
-      <Content />
+  <section class="t-page">
+    <header class="t-section-head">
+      <span class="t-section-num">/01</span>
+      <h1 class="t-section-title">ABOUT</h1>
+      <span class="t-mono-sm t-dim">who's behind the terminal</span>
+    </header>
+
+    <div class="t-about-grid">
+      <aside class="t-rail">
+        <dl class="t-rail-list">
+          <div class="t-rail-row">
+            <dt class="t-mono-sm t-dim">location</dt>
+            <dd class="t-mono-sm">Berlin</dd>
+          </div>
+          <div class="t-rail-row">
+            <dt class="t-mono-sm t-dim">since</dt>
+            <dd class="t-mono-sm">2005</dd>
+          </div>
+          <div class="t-rail-row">
+            <dt class="t-mono-sm t-dim">stack</dt>
+            <dd class="t-mono-sm">TS / React</dd>
+          </div>
+          <div class="t-rail-row">
+            <dt class="t-mono-sm t-dim">role</dt>
+            <dd class="t-mono-sm">Sr. Frontend</dd>
+          </div>
+          {updated && (
+            <div class="t-rail-row">
+              <dt class="t-mono-sm t-dim">updated</dt>
+              <dd class="t-mono-sm">{updated}</dd>
+            </div>
+          )}
+        </dl>
+      </aside>
+
+      <article class="t-about-body prose prose-lg">
+        <Content />
+      </article>
     </div>
-  </PageLayout>
+  </section>
 </Layout>
+
+<style>
+  .t-page { padding: 24px 0 56px; }
+  .t-about-grid { display: grid; grid-template-columns: 200px 1fr; gap: 56px; align-items: start; }
+  .t-rail { position: sticky; top: 110px; border-left: 1px dashed var(--line-2); padding-left: 16px; }
+  .t-rail-list { margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .t-rail-row { display: flex; flex-direction: column; gap: 2px; }
+  .t-rail-row dt { margin: 0; }
+  .t-rail-row dd { margin: 0; color: var(--ink); }
+
+  .t-about-body { max-width: 64ch; }
+  .t-about-body :global(h2) {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+    margin-top: 48px;
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .t-about-body :global(h2:first-child) { border-top: 0; padding-top: 0; margin-top: 0; }
+  .t-about-body :global(h3) { font-family: var(--serif); font-weight: 400; font-size: 22px; }
+  .t-about-body :global(p) { font-family: var(--serif); font-size: 18px; line-height: 1.55; color: var(--ink-2); }
+  .t-about-body :global(ul) { font-family: var(--serif); font-size: 18px; line-height: 1.55; color: var(--ink-2); }
+  .t-about-body :global(li) { margin: 6px 0; }
+  .t-about-body :global(a) { color: var(--ink); border-bottom: 1px dashed var(--line-2); text-decoration: none; }
+  .t-about-body :global(a:hover) { color: var(--accent); border-bottom-color: var(--accent); }
+
+  @media (max-width: 768px) {
+    .t-about-grid { grid-template-columns: 1fr; gap: 24px; }
+    .t-rail { position: static; border-left: 0; border-top: 1px dashed var(--line-2); padding-left: 0; padding-top: 16px; }
+    .t-rail-list { flex-direction: row; flex-wrap: wrap; gap: 14px; }
+  }
+</style>

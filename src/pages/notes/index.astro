@@ -1,49 +1,81 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { formatDate } from "../../utils/date";
 import { getCollection, type CollectionEntry } from "astro:content";
-import Card from "../../components/ui/Card.astro";
-import Tag from "../../components/ui/Tag.astro";
-import PageLayout from "../../components/layout/PageLayout.astro";
-
-// Get all notes from the collection
-const notes = await getCollection("notes");
-
-// Sort by date (newest first)
-notes.sort(
-  (a: CollectionEntry<"notes">, b: CollectionEntry<"notes">) =>
-    b.data.date.valueOf() - a.data.date.valueOf()
-);
 
 type Note = CollectionEntry<"notes">;
-const typedNotes: Note[] = notes;
+
+const notes = (await getCollection("notes")).sort(
+  (a: Note, b: Note) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+const groups = new Map<string, Note[]>();
+for (const n of notes) {
+  const y = String(n.data.date.getFullYear());
+  if (!groups.has(y)) groups.set(y, []);
+  groups.get(y)!.push(n);
+}
+const years = [...groups.keys()];
 ---
 
 <Layout title="Notes | Francesco Esposito">
-  <PageLayout
-    title="Notes"
-    description="Short tips, TILs, and things I've picked up along the way."
-  >
-    <div class="flex flex-col gap-8">
-      {
-        typedNotes.map((note) => (
-          <Card url={`/notes/${note.slug}`}>
-            <h2 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">
-              {note.data.title}
-            </h2>
-            <div class="mb-2 text-sm text-gray-500 dark:text-gray-400">
-              {formatDate(note.data.date)}
-            </div>
-            {note.data.tags.length > 0 && (
-              <div class="flex flex-wrap gap-2">
-                {note.data.tags.map((tag: string) => (
-                  <Tag text={tag} />
-                ))}
-              </div>
-            )}
-          </Card>
-        ))
-      }
-    </div>
-  </PageLayout>
+  <section class="t-page">
+    <header class="t-section-head">
+      <span class="t-section-num">/01</span>
+      <h1 class="t-section-title">NOTES</h1>
+      <span class="t-mono-sm t-dim">short tips, TILs, fragments</span>
+      <span class="t-spacer"></span>
+      <span class="t-mono-sm t-dim">{notes.length} entries</span>
+    </header>
+
+    {notes.length === 0 && (
+      <p class="t-empty">No notes yet.</p>
+    )}
+
+    {years.map((year) => (
+      <div class="t-year">
+        <div class="t-year-head">
+          <span class="t-mono-sm t-dim">/{year}</span>
+          <span class="t-year-rule"></span>
+          <span class="t-mono-sm t-dim">{groups.get(year)!.length}</span>
+        </div>
+        <ul class="t-list">
+          {groups.get(year)!.map((note) => {
+            const date = note.data.date.toISOString().slice(5, 10);
+            const tag = note.data.tags?.[0];
+            return (
+              <li class="t-list-row">
+                <a href={`/notes/${note.slug}`} class="t-list-link">
+                  <span class="t-mono-sm t-dim t-list-date">{date}</span>
+                  <span class="t-list-title">{note.data.title}</span>
+                  <span class="t-spacer"></span>
+                  {tag && <span class="t-mono-sm t-tag-sm">#{tag}</span>}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    ))}
+  </section>
 </Layout>
+
+<style>
+  .t-page { padding: 24px 0 56px; }
+  .t-year { margin-top: 40px; }
+  .t-year:first-of-type { margin-top: 24px; }
+  .t-year-head { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+  .t-year-rule { flex: 1; height: 0; border-top: 1px dashed var(--line); }
+  .t-list { list-style: none; margin: 0; padding: 0; }
+  .t-list-row { border-bottom: 1px solid var(--line); }
+  .t-list-link { display: flex; align-items: baseline; gap: 14px; padding: 12px 0; text-decoration: none; color: inherit; transition: padding .15s, background .15s; }
+  .t-list-link:hover { padding-left: 8px; background: linear-gradient(90deg, rgba(216,255,62,0.05), transparent 30%); }
+  .t-list-date { width: 56px; flex-shrink: 0; color: var(--dim); }
+  .t-list-title { font-family: var(--serif); font-size: 19px; color: var(--ink); }
+  .t-tag-sm { font-family: var(--mono); font-size: 10px; color: var(--accent); letter-spacing: 0.06em; text-transform: lowercase; padding: 1px 6px; border: 1px solid var(--line-2); }
+  .t-empty { font-family: var(--serif); color: var(--ink-2); margin-top: 24px; }
+
+  @media (max-width: 640px) {
+    .t-list-date { width: 48px; }
+    .t-list-title { font-size: 17px; }
+  }
+</style>

@@ -1,157 +1,79 @@
 ---
-import { HEADER_LINKS, SITE_TITLE } from "../../consts";
-
-// Determine the active link based on the current path
+import { HEADER_LINKS } from "../../consts";
 const path = Astro.url.pathname;
+const tabs = HEADER_LINKS.map((l, i) => ({ ...l, num: String(i + 1).padStart(2, "0") }));
 ---
 
-<header
-  class="fixed top-0 right-0 left-0 z-40 border-b border-gray-200 backdrop-blur-sm bg-white/95 dark:bg-gray-900/95 dark:border-gray-700"
-  transition:persist="header"
->
-  <div class="px-6 py-4">
-    <div class="flex justify-between items-center">
-      <!-- Website name - only visible on mobile/smaller screens -->
-      <a
-        href="/"
-        class="flex items-center h-9 text-lg font-semibold tracking-tight text-blue-600 transition-opacity dark:text-blue-400 hover:opacity-80 leading-[36px] lg:hidden"
-      >
-        {SITE_TITLE}
-      </a>
-
-      <!-- Empty div for spacing on larger screens -->
-      <div class="hidden lg:block"></div>
-
-      <!-- Navigation and Toggle -->
-      <div class="flex items-center space-x-6">
-        <!-- Navigation items -->
-        <nav class="hidden items-center space-x-6 md:flex">
-          {
-            HEADER_LINKS.map((link) => {
-              const isActive =
-                path === link.url || path.startsWith(`${link.url}/`);
-              return (
-                <a
-                  href={link.url}
-                  class={`h-9 flex items-center font-medium transition-colors leading-[36px] ${
-                    isActive
-                      ? "text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400"
-                      : "text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
-                  }`}
-                >
-                  {link.name}
-                </a>
-              );
-            })
-          }
-        </nav>
-
-        <!-- Simple Dark Mode Toggle -->
-        <button
-          id="theme-toggle"
-          class="text-gray-600 dark:text-gray-300 h-9 flex items-center leading-[36px]"
-          aria-label="Toggle between Dark and Light mode"
-        >
-          <span class="sr-only">Toggle between Dark and Light mode</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            class="block dark:hidden"
-          >
-            <path
-              d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-            ></path>
-          </svg>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            class="hidden dark:block"
-          >
-            <path
-              d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"
-            ></path>
-          </svg>
-        </button>
-
-        <!-- Mobile Menu Button -->
-        <button
-          id="mobile-menu-button"
-          class="p-2 text-gray-600 rounded-md dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800 md:hidden"
-          aria-label="Toggle menu"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="w-6 h-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 6h16M4 12h16M4 18h16"></path>
-          </svg>
-        </button>
-      </div>
-    </div>
+<header class="t-topbar">
+  <div class="t-topbar-l">
+    <span class="t-dot"></span>
+    <span class="t-mono-sm">phoinixi@workstation</span>
+    <span class="t-sep">::</span>
+    <span class="t-mono-sm t-dim">~/site{path === "/" ? "" : path}</span>
+  </div>
+  <nav class="t-tabs" aria-label="Primary">
+    {tabs.map((t) => {
+      const isActive = path === t.url || (t.url !== "/" && path.startsWith(t.url));
+      return (
+        <a href={t.url} class={`t-tab ${isActive ? "is-active" : ""}`}>
+          <span class="t-tab-num">{t.num}</span>
+          <span>{t.name.toLowerCase()}</span>
+        </a>
+      );
+    })}
+  </nav>
+  <div class="t-topbar-r">
+    <span class="t-mono-sm t-dim">UTC+1</span>
+    <span class="t-sep">·</span>
+    <span class="t-mono-sm" id="t-clock">--:--:--</span>
+    <span class="t-cursor">_</span>
   </div>
 </header>
 
-<!-- Mobile Menu (Hidden by default) -->
-<div
-  id="mobile-menu"
-  class="hidden fixed inset-0 z-50 bg-white dark:bg-gray-900 md:hidden"
->
-  <div class="flex flex-col px-6 py-8 h-full">
-    <div class="flex justify-between items-center mb-8">
-      <!-- Website name in mobile menu -->
-      <a
-        href="/"
-        class="flex items-center text-xl font-semibold text-blue-600 dark:text-blue-400"
-      >
-        {SITE_TITLE}
-      </a>
+<script is:inline>
+  (function () {
+    const el = document.getElementById("t-clock");
+    if (!el) return;
+    const tick = () => {
+      const d = new Date();
+      const p = (n) => String(n).padStart(2, "0");
+      el.textContent = `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+    };
+    tick();
+    setInterval(tick, 1000);
+  })();
+</script>
 
-      <button
-        id="close-mobile-menu"
-        class="p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="w-6 h-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-      </button>
-    </div>
+<style>
+  .t-topbar {
+    position: sticky; top: 0; z-index: 50;
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+    padding: 12px 24px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+  .t-topbar-l { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .t-topbar-r { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+  .t-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 12px var(--accent); flex-shrink: 0; }
+  .t-tabs { display: flex; gap: 0; border: 1px solid var(--line); }
+  .t-tab {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 14px; background: transparent; border: 0; border-right: 1px solid var(--line);
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-2); cursor: pointer; transition: background .15s, color .15s;
+    text-decoration: none;
+  }
+  .t-tab:last-child { border-right: 0; }
+  .t-tab:hover { background: var(--bg-2); color: var(--ink); }
+  .t-tab.is-active { background: var(--accent); color: #0c0d0c; }
+  .t-tab-num { color: var(--dim); }
+  .t-tab.is-active .t-tab-num { color: rgba(0,0,0,0.5); }
 
-    <nav
-      class="flex flex-col flex-1 justify-center items-center space-y-6 text-center"
-    >
-      {
-        HEADER_LINKS.map((link) => (
-          <a
-            href={link.url}
-            class="text-xl font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
-          >
-            {link.name}
-          </a>
-        ))
-      }
-    </nav>
-  </div>
-</div>
+  @media (max-width: 768px) {
+    .t-topbar { grid-template-columns: 1fr auto; padding: 10px 14px; }
+    .t-topbar-r { display: none; }
+    .t-tabs { font-size: 10px; }
+    .t-tab { padding: 5px 8px; }
+    .t-tab span:not(.t-tab-num) { display: none; }
+  }
+</style>

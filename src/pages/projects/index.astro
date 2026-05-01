@@ -1,74 +1,114 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import { getCollection, type CollectionEntry } from "astro:content";
-import Card from "../../components/ui/Card.astro";
-import Tag from "../../components/ui/Tag.astro";
-import PageLayout from "../../components/layout/PageLayout.astro";
 
-// Get all projects from the collection
-const allProjects = await getCollection("projects");
-
-// Sort by featured (featured projects first), then by year (newest first)
-const projects = allProjects.sort(
-  (a: CollectionEntry<"projects">, b: CollectionEntry<"projects">) => {
-    // First sort by featured status
-    if (a.data.featured && !b.data.featured) return -1;
-    if (!a.data.featured && b.data.featured) return 1;
-
-    // Then sort by year (descending)
-    return b.data.year.localeCompare(a.data.year);
-  }
-);
-
-// Type alias for projects
 type Project = CollectionEntry<"projects">;
 
-// Cast the projects to the correct type to avoid type errors in the template
-console.log("Projects:", projects);
-const typedProjects: Project[] = projects.filter((project: Project) => !project.data.draft);
+const all = (await getCollection("projects")).filter((p: Project) => !p.data.draft);
 
-// Helper function to render tags with proper typing
-function renderTags(tags: string[]) {
-  return tags.map((tag) => `<span class="post-tag">#${tag}</span>`).join("");
-}
+const featured = all
+  .filter((p: Project) => p.data.featured)
+  .sort((a: Project, b: Project) => b.data.year.localeCompare(a.data.year));
+
+const rest = all
+  .filter((p: Project) => !p.data.featured)
+  .sort((a: Project, b: Project) => b.data.year.localeCompare(a.data.year));
 ---
 
 <Layout title="Projects | Francesco Esposito">
-  <PageLayout
-    title="Projects"
-    description="Open-source projects and experiments I've worked on over the years."
-  >
-    <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
-      {
-        typedProjects.map((project) => (
-          <Card
-            url={project.data.link}
-            target="_blank"
-            class="flex flex-col h-full"
-          >
-            <div class="flex-grow">
-              <div class="flex justify-between items-start mb-2">
-                <h2 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">
-                  {project.data.title}
-                </h2>
-                <span class="text-sm text-gray-500 dark:text-gray-400">
-                  {project.data.year}
-                </span>
+  <section class="t-page">
+    <header class="t-section-head">
+      <span class="t-section-num">/01</span>
+      <h1 class="t-section-title">PROJECTS</h1>
+      <span class="t-mono-sm t-dim">open-source &amp; experiments</span>
+      <span class="t-spacer"></span>
+      <span class="t-mono-sm t-dim">{all.length} total</span>
+    </header>
+
+    {featured.length > 0 && (
+      <section class="t-feat">
+        <header class="t-section-head t-section-head-sub">
+          <span class="t-section-num">/02</span>
+          <h2 class="t-section-title">FEATURED</h2>
+          <span class="t-spacer"></span>
+          <span class="t-mono-sm t-dim">{featured.length}</span>
+        </header>
+        <div class="t-feat-grid">
+          {featured.map((p, i) => (
+            <article class="t-feat-card">
+              <div class="t-feat-top">
+                <span class="t-mono-sm t-dim">/{String(i + 1).padStart(2, "0")}</span>
+                <span class="t-mono-sm">{p.data.year}</span>
               </div>
-              <p class="mb-4 text-gray-600 dark:text-gray-300">
-                {project.data.description}
-              </p>
-            </div>
-            <div class="flex justify-between items-center mt-4">
-              <div class="flex flex-wrap gap-2">
-                {project.data.tags.map((tag: string) => (
-                  <Tag text={tag} />
-                ))}
+              <h3 class="t-feat-title">{p.data.title}</h3>
+              <p class="t-feat-blurb">{p.data.description}</p>
+              <div class="t-feat-tags">
+                {p.data.tags.map((t: string) => <span class="t-pill">#{t}</span>)}
               </div>
-            </div>
-          </Card>
-        ))
-      }
-    </div>
-  </PageLayout>
+              <div class="t-feat-foot">
+                <a class="t-mono-sm t-link" href={p.data.link} target="_blank" rel="noopener">view ↗</a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {rest.length > 0 && (
+      <section class="t-rest">
+        <header class="t-section-head t-section-head-sub">
+          <span class="t-section-num">/{featured.length > 0 ? "03" : "02"}</span>
+          <h2 class="t-section-title">ARCHIVE</h2>
+          <span class="t-spacer"></span>
+          <span class="t-mono-sm t-dim">{rest.length}</span>
+        </header>
+        <ul class="t-list">
+          {rest.map((p) => (
+            <li class="t-list-row">
+              <a href={p.data.link} target="_blank" rel="noopener" class="t-list-link">
+                <span class="t-mono-sm t-dim t-list-date">{p.data.year}</span>
+                <span class="t-list-title">{p.data.title}</span>
+                <span class="t-list-blurb t-mono-sm t-dim">{p.data.description}</span>
+                <span class="t-spacer"></span>
+                {p.data.tags?.[0] && <span class="t-mono-sm t-tag-sm">#{p.data.tags[0]}</span>}
+                <span class="t-mono-sm t-dim t-list-arrow">↗</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+  </section>
 </Layout>
+
+<style>
+  .t-page { padding: 24px 0 56px; }
+  .t-feat { padding: 32px 0; }
+  .t-section-head-sub { margin-top: 24px; }
+  .t-feat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--line); }
+  .t-feat-card { display: flex; flex-direction: column; gap: 12px; padding: 24px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--bg-2); }
+  .t-feat-card:nth-child(2n) { border-right: 0; }
+  .t-feat-card:hover { outline: 1px solid var(--accent); outline-offset: -1px; }
+  .t-feat-top { display: flex; justify-content: space-between; }
+  .t-feat-title { font-family: var(--serif); font-weight: 400; font-size: 28px; letter-spacing: -0.01em; margin: 0; color: var(--ink); }
+  .t-feat-blurb { font-family: var(--serif); font-size: 16px; line-height: 1.45; color: var(--ink-2); margin: 0; }
+  .t-feat-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .t-feat-foot { margin-top: auto; display: flex; align-items: center; padding-top: 8px; border-top: 1px dashed var(--line); }
+
+  .t-rest { padding: 32px 0 56px; }
+  .t-list { list-style: none; margin: 0; padding: 0; }
+  .t-list-row { border-bottom: 1px solid var(--line); }
+  .t-list-link { display: flex; align-items: baseline; gap: 14px; padding: 12px 0; text-decoration: none; color: inherit; transition: padding .15s, background .15s; }
+  .t-list-link:hover { padding-left: 8px; background: linear-gradient(90deg, rgba(216,255,62,0.05), transparent 30%); }
+  .t-list-date { width: 56px; flex-shrink: 0; color: var(--dim); }
+  .t-list-title { font-family: var(--serif); font-size: 19px; color: var(--ink); flex-shrink: 0; }
+  .t-list-blurb { color: var(--dim); text-transform: none; letter-spacing: 0; font-size: 12px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .t-list-arrow { color: var(--dim); }
+  .t-tag-sm { font-family: var(--mono); font-size: 10px; color: var(--accent); letter-spacing: 0.06em; text-transform: lowercase; padding: 1px 6px; border: 1px solid var(--line-2); }
+
+  @media (max-width: 768px) {
+    .t-feat-grid { grid-template-columns: 1fr; }
+    .t-feat-card { border-right: 0 !important; }
+    .t-list-blurb { display: none; }
+  }
+</style>

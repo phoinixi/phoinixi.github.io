@@ -1,8 +1,6 @@
 ---
 import { getCollection, type CollectionEntry } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
-import PageLayout from "../../components/layout/PageLayout.astro";
-import { formatDate } from "../../utils/date";
 
 export async function getStaticPaths() {
   const notes = await getCollection("notes");
@@ -12,39 +10,54 @@ export async function getStaticPaths() {
   }));
 }
 
-type Props = {
-  entry: CollectionEntry<"notes">;
-};
+type Props = { entry: CollectionEntry<"notes"> };
 
 const { entry } = Astro.props as Props;
 const { Content } = await entry.render();
 const { title, date, tags } = entry.data;
+const dateStr = new Date(date).toISOString().slice(0, 10);
 ---
 
-<Layout title={title}>
-  <PageLayout title={title}>
-    <div class="mb-6">
-      <div class="mb-2 text-sm text-gray-500 dark:text-gray-400">
-        {formatDate(date)}
+<Layout title={`${title} | Notes`}>
+  <article class="t-note">
+    <header class="t-note-head">
+      <div class="t-note-meta">
+        <span class="t-mono-sm t-dim">/note</span>
+        <span class="t-sep">·</span>
+        <time class="t-mono-sm t-dim" datetime={new Date(date).toISOString()}>{dateStr}</time>
       </div>
-      {
-        tags && tags.length > 0 && (
-          <div class="flex flex-wrap gap-2">
-            {tags.map((tag: string) => (
-              <a
-                href={`/blog/tag/${tag}`}
-                class="px-3 py-1 text-sm text-gray-800 bg-gray-100 rounded-full transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-              >
-                #{tag}
-              </a>
-            ))}
-          </div>
-        )
-      }
-    </div>
+      <h1 class="t-note-title">{title}</h1>
+      {tags && tags.length > 0 && (
+        <div class="t-note-tags">
+          {tags.map((tag: string) => (
+            <a href={`/blog/tag/${tag}`} class="t-pill">#{tag}</a>
+          ))}
+        </div>
+      )}
+    </header>
 
-    <div class="prose dark:prose-invert max-w-none">
+    <div class="t-note-body prose prose-lg">
       <Content />
     </div>
-  </PageLayout>
+
+    <footer class="t-note-foot">
+      <a href="/notes" class="t-mono-sm t-link">← all notes</a>
+    </footer>
+  </article>
 </Layout>
+
+<style>
+  .t-note { padding: 24px 0 56px; max-width: 72ch; margin: 0 auto; }
+  .t-note-head { margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+  .t-note-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .t-note-title { font-family: var(--serif); font-weight: 400; font-size: clamp(32px, 4.2vw, 44px); line-height: 1.1; letter-spacing: -0.015em; margin: 0; color: var(--ink); }
+  .t-note-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+  .t-note-tags a { text-decoration: none; }
+  .t-note-body :global(h2) { font-family: var(--serif); font-weight: 400; font-size: 24px; color: var(--ink); margin-top: 32px; }
+  .t-note-body :global(p) { font-family: var(--serif); font-size: 17px; line-height: 1.6; color: var(--ink-2); }
+  .t-note-body :global(a) { color: var(--ink); border-bottom: 1px dashed var(--line-2); text-decoration: none; }
+  .t-note-body :global(a:hover) { color: var(--accent); border-bottom-color: var(--accent); }
+  .t-note-body :global(code) { font-family: var(--mono); color: var(--accent); background: var(--bg-2); border: 1px solid var(--line); padding: 1px 5px; }
+  .t-note-body :global(pre) { background: var(--bg-2); border: 1px solid var(--line); }
+  .t-note-foot { margin-top: 48px; padding-top: 18px; border-top: 1px dashed var(--line); }
+</style>
