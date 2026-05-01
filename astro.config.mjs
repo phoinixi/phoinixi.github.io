@@ -7,6 +7,12 @@ import mdx from "@astrojs/mdx";
 export default defineConfig({
   site: "https://phoinixi.github.io",
   integrations: [mdx()],
+  markdown: {
+    shikiConfig: {
+      theme: "vitesse-dark",
+      wrap: false,
+    },
+  },
   vite: {
     plugins: [tailwindcss()],
   },

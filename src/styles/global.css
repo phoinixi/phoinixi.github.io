@@ -119,8 +119,8 @@ body::before {
 .prose { color: var(--ink-2); font-family: var(--serif); }
 .prose h1, .prose h2, .prose h3, .prose h4 { color: var(--ink); font-family: var(--serif); }
 .prose code { font-family: var(--mono); color: var(--accent); background: var(--bg-2); border: 1px solid var(--line); padding: 1px 5px; border-radius: 2px; }
-.prose pre { background: var(--bg-2); border: 1px solid var(--line); }
-.prose pre code { color: var(--ink); border: 0; background: transparent; padding: 0; }
+.prose pre, .prose pre.astro-code { background: var(--bg-2) !important; border: 1px solid var(--line); border-radius: 2px; padding: 16px 18px; font-size: 13px; line-height: 1.6; }
+.prose pre code { color: var(--ink); border: 0; background: transparent; padding: 0; font-size: inherit; }
 .prose a { color: var(--ink); border-bottom: 1px dashed var(--line-2); text-decoration: none; }
 .prose a:hover { color: var(--accent); border-bottom-color: var(--accent); }
 .prose blockquote { color: var(--ink-2); border-color: var(--line-2); }
