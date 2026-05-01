@@ -2,32 +2,53 @@
 import { HEADER_LINKS } from "../../consts";
 const path = Astro.url.pathname;
 const tabs = HEADER_LINKS.map((l, i) => ({ ...l, num: String(i + 1).padStart(2, "0") }));
+
+const segments = path.split("/").filter(Boolean);
+const crumbs = segments.map((seg, i) => ({
+  label: decodeURIComponent(seg),
+  href: "/" + segments.slice(0, i + 1).join("/"),
+  isLeaf: i === segments.length - 1,
+}));
 ---
 
-<header class="t-topbar">
-  <div class="t-topbar-l">
-    <span class="t-dot"></span>
-    <span class="t-mono-sm">phoinixi@workstation</span>
-    <span class="t-sep">::</span>
-    <span class="t-mono-sm t-dim t-path">~/site{path === "/" ? "" : path}</span>
+<header class="t-header">
+  <div class="t-topbar">
+    <div class="t-topbar-l">
+      <span class="t-dot"></span>
+      <span class="t-mono-sm">phoinixi@workstation</span>
+    </div>
+    <nav class="t-tabs" aria-label="Primary">
+      {tabs.map((t) => {
+        const isActive = path === t.url || (t.url !== "/" && path.startsWith(t.url));
+        return (
+          <a href={t.url} class={`t-tab ${isActive ? "is-active" : ""}`}>
+            <span class="t-tab-num">{t.num}</span>
+            <span>{t.name.toLowerCase()}</span>
+          </a>
+        );
+      })}
+    </nav>
+    <div class="t-topbar-r">
+      <span class="t-mono-sm t-dim">UTC+1</span>
+      <span class="t-sep">·</span>
+      <span class="t-mono-sm" id="t-clock">--:--:--</span>
+      <span class="t-cursor">_</span>
+    </div>
   </div>
-  <nav class="t-tabs" aria-label="Primary">
-    {tabs.map((t) => {
-      const isActive = path === t.url || (t.url !== "/" && path.startsWith(t.url));
-      return (
-        <a href={t.url} class={`t-tab ${isActive ? "is-active" : ""}`}>
-          <span class="t-tab-num">{t.num}</span>
-          <span>{t.name.toLowerCase()}</span>
-        </a>
-      );
-    })}
+
+  <nav class="t-crumbs" aria-label="Breadcrumb">
+    <span class="t-crumb-prompt">::</span>
+    <a href="/" class={`t-crumb ${crumbs.length === 0 ? "is-leaf" : ""}`}>~/site</a>
+    {crumbs.map((c) => (
+      <>
+        <span class="t-crumb-slash">/</span>
+        {c.isLeaf
+          ? <span class="t-crumb is-leaf" aria-current="page">{c.label}</span>
+          : <a href={c.href} class="t-crumb">{c.label}</a>
+        }
+      </>
+    ))}
   </nav>
-  <div class="t-topbar-r">
-    <span class="t-mono-sm t-dim">UTC+1</span>
-    <span class="t-sep">·</span>
-    <span class="t-mono-sm" id="t-clock">--:--:--</span>
-    <span class="t-cursor">_</span>
-  </div>
 </header>
 
 <script is:inline>
@@ -45,16 +66,13 @@ const tabs = HEADER_LINKS.map((l, i) => ({ ...l, num: String(i + 1).padStart(2, 
 </script>
 
 <style>
+  .t-header { position: sticky; top: 0; z-index: 50; background: var(--bg); border-bottom: 1px solid var(--line); }
   .t-topbar {
-    position: sticky; top: 0; z-index: 50;
     display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
     padding: 12px 24px;
-    background: var(--bg);
-    border-bottom: 1px solid var(--line);
   }
   .t-topbar-l { display: flex; align-items: center; gap: 10px; min-width: 0; }
   .t-topbar-l > * { flex-shrink: 0; }
-  .t-topbar-l .t-path { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .t-topbar-r { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
   .t-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 12px var(--accent); flex-shrink: 0; }
   .t-tabs { display: flex; gap: 0; border: 1px solid var(--line); }
@@ -71,6 +89,24 @@ const tabs = HEADER_LINKS.map((l, i) => ({ ...l, num: String(i + 1).padStart(2, 
   .t-tab-num { color: var(--dim); }
   .t-tab.is-active .t-tab-num { color: rgba(0,0,0,0.5); }
 
+  .t-crumbs {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 24px;
+    border-top: 1px solid var(--line);
+    background: var(--bg-2);
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+  .t-crumb-prompt { color: var(--dim); flex-shrink: 0; }
+  .t-crumb-slash { color: var(--dim); flex-shrink: 0; }
+  .t-crumb {
+    color: var(--ink-2); text-decoration: none; white-space: nowrap; flex-shrink: 0;
+    border-bottom: 1px dashed transparent; transition: color .15s, border-color .15s;
+  }
+  a.t-crumb:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .t-crumb.is-leaf { color: var(--accent); }
+
   @media (max-width: 768px) {
     .t-topbar {
       grid-template-columns: 1fr;
@@ -78,12 +114,11 @@ const tabs = HEADER_LINKS.map((l, i) => ({ ...l, num: String(i + 1).padStart(2, 
       padding: 10px 14px;
     }
     .t-topbar-l { gap: 8px; }
-    .t-topbar-l .t-sep,
-    .t-topbar-l .t-path,
     .t-topbar-r { display: none; }
     .t-tabs { width: 100%; font-size: 10px; }
     .t-tab { flex: 1; justify-content: center; padding: 6px 4px; gap: 0; min-width: 0; }
     .t-tab-num { display: none; }
+    .t-crumbs { padding: 6px 14px; font-size: 10px; }
   }
 
   @media (max-width: 360px) {
