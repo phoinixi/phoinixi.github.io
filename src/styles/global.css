@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+@import "@fontsource-variable/fraunces/wght.css";
+@import "@fontsource-variable/fraunces/wght-italic.css";
+@import "@fontsource-variable/jetbrains-mono/wght.css";
+
 /* ─── TERMINAL/01 — design tokens ───────────────────────────── */
 :root {
   --bg: #0c0d0c;
