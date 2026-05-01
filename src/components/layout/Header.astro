@@ -9,7 +9,7 @@ const tabs = HEADER_LINKS.map((l, i) => ({ ...l, num: String(i + 1).padStart(2, 
     <span class="t-dot"></span>
     <span class="t-mono-sm">phoinixi@workstation</span>
     <span class="t-sep">::</span>
-    <span class="t-mono-sm t-dim">~/site{path === "/" ? "" : path}</span>
+    <span class="t-mono-sm t-dim t-path">~/site{path === "/" ? "" : path}</span>
   </div>
   <nav class="t-tabs" aria-label="Primary">
     {tabs.map((t) => {
@@ -70,10 +70,21 @@ const tabs = HEADER_LINKS.map((l, i) => ({ ...l, num: String(i + 1).padStart(2, 
   .t-tab.is-active .t-tab-num { color: rgba(0,0,0,0.5); }
 
   @media (max-width: 768px) {
-    .t-topbar { grid-template-columns: 1fr auto; padding: 10px 14px; }
+    .t-topbar {
+      grid-template-columns: 1fr;
+      gap: 8px;
+      padding: 10px 14px;
+    }
+    .t-topbar-l { gap: 8px; }
+    .t-topbar-l .t-sep,
+    .t-topbar-l .t-path,
     .t-topbar-r { display: none; }
-    .t-tabs { font-size: 10px; }
-    .t-tab { padding: 5px 8px; }
-    .t-tab span:not(.t-tab-num) { display: none; }
+    .t-tabs { width: 100%; font-size: 10px; }
+    .t-tab { flex: 1; justify-content: center; padding: 6px 4px; gap: 0; min-width: 0; }
+    .t-tab-num { display: none; }
+  }
+
+  @media (max-width: 360px) {
+    .t-tab { font-size: 9px; letter-spacing: 0.04em; }
   }
 </style>
