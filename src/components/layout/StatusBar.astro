@@ -1,5 +1,4 @@
 ---
-// src/components/layout/StatusBar.astro
 import { getCollection, getEntry } from "astro:content";
 
 let focus = "Available for new work";
@@ -15,11 +14,6 @@ const latest = posts.sort((a, b) => +b.data.pubDate - +a.data.pubDate)[0];
 const daysAgo = latest ? Math.max(1, Math.floor((Date.now() - +latest.data.pubDate) / 86400000)) : 0;
 const rel = daysAgo < 30 ? `${daysAgo}d ago` : daysAgo < 365 ? `${Math.floor(daysAgo/30)}mo ago` : `${Math.floor(daysAgo/365)}y ago`;
 const latestTitle = latest ? (latest.data.title.length > 36 ? latest.data.title.slice(0, 34) + "…" : latest.data.title) : "—";
-
-const projects = (await getCollection("projects")).filter((p) => !p.data.draft);
-const reposCount = projects.length;
-const fresh = projects.sort((a, b) => Number(b.data.year) - Number(a.data.year))[0];
-const freshTitle = fresh ? fresh.data.title : "";
 ---
 
 <aside class="t-statusbar" aria-label="Status">
@@ -35,11 +29,6 @@ const freshTitle = fresh ? fresh.data.title : "";
       {latest ? <a href={`/blog/${latest.slug}`} class="t-stat-link">{latestTitle}</a> : "—"}
     </span>
     {latest && <span class="t-stat-aux">{rel}</span>}
-  </div>
-  <div class="t-stat-cell">
-    <span class="t-stat-k">REPOS</span>
-    <span class="t-stat-v">{reposCount} ACTIVE</span>
-    {freshTitle && <span class="t-stat-aux">fresh: {freshTitle}</span>}
   </div>
   <div class="t-stat-cell">
     <span class="t-stat-led t-led-green"></span>
@@ -79,7 +68,7 @@ const freshTitle = fresh ? fresh.data.title : "";
 <style>
   .t-statusbar {
     position: sticky; top: 49px; z-index: 40;
-    display: grid; grid-template-columns: 1.4fr 1.6fr 1.2fr 1.2fr 1fr;
+    display: grid; grid-template-columns: 1.4fr 1.6fr 1.2fr 1.1fr;
     align-items: stretch;
     border-bottom: 1px solid var(--line);
     background: var(--bg-2);
@@ -106,7 +95,7 @@ const freshTitle = fresh ? fresh.data.title : "";
   .t-stat-aux { font-size: 10px; color: var(--dim); letter-spacing: 0.06em; text-transform: uppercase; flex-shrink: 0; margin-left: auto; }
   @media (max-width: 1100px) {
     .t-statusbar { grid-template-columns: 1fr 1fr; }
-    .t-stat-cell:nth-child(n+5) { display: none; }
+    .t-stat-cell:nth-child(n+4) { display: none; }
   }
   @media (max-width: 640px) {
     .t-statusbar { grid-template-columns: 1fr; }
