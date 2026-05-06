@@ -1,0 +1,61 @@
+---
+title: "Resuml + Claude Code: tailoring a resume from a chat"
+description: "Resuml now ships an MCP server, so Claude Code can validate, ATS-score, render, and export your resume without you ever leaving the conversation."
+pubDate: 2026-05-06
+tags: ["resuml", "mcp", "claude-code", "resume", "ats", "open-source"]
+featured: true
+---
+
+A quick follow-up to [Introducing Resuml](/blog/introducing-resuml/). The CLI is still there, the YAML is still there, but the part I'm most excited about is that resuml now ships a [Model Context Protocol](https://modelcontextprotocol.io/) server. That means Claude Code (or any MCP client, really) can drive the whole thing through a chat.
+
+## Setup, in one line
+
+In the project where your `resume.yaml` lives:
+
+```bash
+claude mcp add resuml -- npx resuml mcp
+```
+
+Add `--scope user` if you want it everywhere, or commit a `.mcp.json` if you're sharing the setup with a team:
+
+```json
+{
+  "mcpServers": {
+    "resuml": {
+      "command": "npx",
+      "args": ["resuml", "mcp"]
+    }
+  }
+}
+```
+
+That's it. `claude mcp list` will confirm it's wired up.
+
+## What changes once it's wired up
+
+Honestly, the workflow flips. Before, I'd open the YAML, eyeball a job description, rewrite a few bullets, run `resuml validate --ats --jd job.txt`, scroll through the output, edit again. Now I save the job ad as `jd.txt` and say something like:
+
+> Tailor `resume.yaml` to `jd.txt`, iterate until the ATS score is at least 80, then render with the stackoverflow theme and export a PDF.
+
+Claude Code reads the YAML, runs the ATS check, sees which keywords are missing and which bullets are weak, edits the file, re-checks, and keeps going until the score clears. Then it renders the HTML and exports the PDF. I just watch.
+
+The reason this works at all is that resuml's ATS scoring is deterministic and offline. No API keys, no LLM grading itself. That matters a lot here, because it means the agent has an honest feedback signal it can't talk its way around. To raise the score, it has to actually improve the resume: add the missing skills you genuinely have, rewrite passive bullets into action verbs, quantify impact, fix date gaps. With a job description, the score is 60% generic checks and 40% keyword match.
+
+## The full toolbox
+
+For reference, the MCP server exposes:
+
+- `resuml_init_resume` to scaffold a starter YAML
+- `resuml_validate` against the JSON Resume schema
+- `resuml_ats_check` for the deterministic score and keyword matching
+- `resuml_render` for HTML with any `jsonresume-theme-*`
+- `resuml_list_themes` to see what's installed
+- `resuml_export_pdf` for PDF via Playwright
+
+It also exposes the schema, the ATS rubric, and the theme catalog as resources, plus a few prompts (`tailor-resume-to-jd`, `optimize-ats-score`, `review-resume`) if you'd rather start from a template than write the request yourself.
+
+## Why I think it's worth your five minutes
+
+Most "AI resume" tools either rewrite your resume into something generic or lock you into a proprietary editor. This is the opposite: your resume stays as plain YAML in your repo, you keep version control, and the agent just helps you iterate faster against a deterministic rubric. If you already use Claude Code, you're maybe 30 seconds of setup away from trying it.
+
+Repo is at [github.com/phoinixi/resuml](https://github.com/phoinixi/resuml). The hosted web app, with 300+ themes pre-installed, is at [resuml.app](https://resuml.app).
