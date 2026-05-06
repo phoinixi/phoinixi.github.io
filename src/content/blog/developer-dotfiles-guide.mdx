@@ -1,91 +1,52 @@
 ---
 title: "A macOS dev setup for humans and AI agents"
-description: "My dotfiles now provision two runtimes side by side: the human shell (Ghostty, Zed, zsh) and the Claude Code agent harness. One install.sh handles both."
+description: "My dotfiles now provision two runtimes side by side: my shell (Ghostty, Zed, zsh) and my Claude Code agent harness. One install.sh handles both."
 pubDate: 2026-05-06
 tags: ["shell", "macos", "productivity", "git", "zsh", "claude-code", "dotfiles"]
 featured: true
 ---
 
-I've kept a [dotfiles repo](https://github.com/phoinixi/dotfiles) for years, but it changed shape recently. Until last year it was the usual stuff: brew, zsh, a Brewfile, some macOS defaults. Now it provisions two things side by side: my human shell and the Claude Code agent harness I use every day. Both come up from a single `./install.sh` on a fresh machine.
+I've kept a [dotfiles repo](https://github.com/phoinixi/dotfiles) for years. For most of that time it was the predictable stuff: brew, zsh, a Brewfile, some macOS defaults, the occasional alias I forgot I added. Then last year I started using Claude Code daily, and for a while my agent config was the one part of my setup that wasn't versioned anywhere. By the time I'd duct-taped my third machine into something workable, I gave up and rewrote the repo around a new premise: my dev environment runs on two co-equal runtimes now, the human shell and the agent harness, and both should come up from a single `./install.sh`.
 
-This post is the short tour.
+This post is what that looks like a year in.
 
-## What's in it now
+## The sane parts
 
-The repo is split into modules. The dispatcher (`install.sh`) runs them in order, and you can pick a single module if you only want to refresh part of the setup:
+Most of it is what you'd expect. Ghostty replaced Hyper somewhere along the way (it's faster and not Electron, no further justification needed). Zed is my main editor, with VS Code kept around for the rare moment I need an extension that hasn't been ported yet. The shell side is zsh on Oh My Zsh with the usual modern coreutils replacements, plus two tools I'd actually fight for: `atuin` for synced shell history and `zoxide` because I'd forgotten how much typing `cd` was costing me. Node lives behind `fnm`, packages through `pnpm` and `npm`. None of this is novel. The Brewfile declares all of it, and re-running `brew bundle` from the install script is idempotent, so I don't have to think about what's already installed.
 
-```bash
-./install.sh                  # everything
-./install.sh --only claude    # re-symlink the agent harness
-./install.sh --only zed
-./install.sh --only ghostty
-```
-
-Layout, trimmed to the parts that matter:
-
-```
-Brewfile                brew bundle source
-.zshrc                  shell config
-install.sh              dispatcher with --only <module>
-install/                numbered modules (00-brew, ..., 60-macos)
-git/                    gitconfig + global gitignore
-osx/                    macOS defaults
-claude/                 Claude Code harness
-zed/                    editor config
-ghostty/                terminal config
-mcp/                    MCP server templates
-bin/scaffold-ai         per-project bootstrap CLI
-AGENTS.md               contract for agents modifying this repo
-```
-
-## The human side
-
-Pretty standard for a 2026 frontend setup, but a few things changed since the last version of this post:
-
-- **Terminal**: [Ghostty](https://ghostty.org) instead of Hyper. Faster, native, no Electron.
-- **Editor**: [Zed](https://zed.dev) as the primary, VS Code kept around as backup. Zed's agent panel and the Claude Code CLI cover most of what I used Cursor for.
-- **CLI tools**: `eza`, `bat`, `ripgrep`, `fzf`, `git-delta`, `zoxide`, `atuin`, `gh`, `httpie`, `jq`/`yq`. `atuin` and `zoxide` are the two I'd miss most if I lost them.
-- **Node**: `fnm` for version management, `pnpm` and `npm` as package managers.
-
-The Brewfile declares all of this. Re-running `brew bundle` from the install script is idempotent, so nothing reinstalls if it's already there.
+The one bit of structural opinion is that the installer is modular. There's a numbered `install/` directory and a dispatcher that runs everything in order, but you can also do `./install.sh --only claude` or `--only ghostty` when you just want to refresh one piece. I use that constantly, mostly when I'm tweaking the agent setup and don't want to wait for brew to think about itself.
 
 ## The agent harness
 
-This is the part that didn't exist a year ago. The `claude/` directory in the repo gets symlinked to `~/.claude/`, which is where Claude Code reads its config from:
+This is the half that didn't exist a year ago. Inside the repo there's a `claude/` directory that gets symlinked to `~/.claude/`. That's where Claude Code reads its global config from: `settings.json`, `CLAUDE.md` (the memory file loaded into every session), and four directories called `agents/`, `commands/`, `hooks/`, and `output-styles/` that hold the cognitive bits I've authored over time. Slash commands I use enough to keep, hooks that gate certain actions, output styles I switch between depending on the project. There's also a tiny `plugins/installed_plugins.json` that just lists which plugins are on (`caveman`, `vercel`, `coderabbit` at the moment).
 
-- `settings.json` - sanitized, durable preferences only
-- `CLAUDE.md` - global agent memory, loaded into every session
-- `agents/`, `commands/`, `hooks/`, `output-styles/` - my authored cognitive tools
-- `plugins/installed_plugins.json` - declares enabled plugins (`caveman`, `vercel`, `coderabbit`)
+The hard part wasn't getting it to symlink, it was figuring out what to track. Claude Code's live `settings.json` is a mix of two things. There's the durable stuff: which plugins I want, my editor mode, the generic permission patterns I've decided are fine on every project (`Bash(git push:*)`, that kind of thing). And then there's the machine-specific noise: per-project absolute-path allowlists like `Bash(node /Users/phoinixi/workspace/some-client/script.js)` that drift in every time I approve a permission prompt on a new repo. If I just committed the live file, every machine would step on every other machine's allowlist within a week.
 
-The trick is the sanitization. Claude Code's live `settings.json` mixes two things: durable preferences (what plugins are on, what edit mode I want) and machine-specific bits like absolute-path permission allowlists. Only the durable part is tracked. The local part lives in `~/.claude/settings.local.json`, which is gitignored, and the install script never touches it.
+So I split it. The repo only tracks the durable bits. The local stuff lives in `~/.claude/settings.local.json`, which is gitignored, and the install script knows not to touch it. Before I commit anything pulled from a live machine, I run `./scripts/sync-claude-settings.sh`, which diffs the two and tells me exactly which lines it would strip. The first time I ran it I was about to commit twelve hardcoded paths into the public repo, so the script has already paid for itself.
 
-Before committing pulled changes, I run `./scripts/sync-claude-settings.sh` and it diffs live vs tracked, telling me exactly what would get stripped. Stops me from accidentally checking in someone else's project paths.
+## scaffold-ai
 
-## Per-project scaffolding
-
-`bin/scaffold-ai` is a small CLI the install script puts on `$PATH`. In any new repo:
+The other piece I rely on every week is a small CLI called `scaffold-ai` that the install puts on `$PATH`. From inside any new project:
 
 ```bash
-mkdir my-app && cd my-app
 scaffold-ai .
 ```
 
-It drops in `.claude/settings.json`, `.claude/commands/`, `.mcp.json`, `AGENTS.md`, `.editorconfig`, and `.gitignore`, with `{{PROJECT}}` replaced by the directory name. Every new project is agent-ready in about three seconds.
+It writes out `.claude/settings.json`, `.claude/commands/`, `.mcp.json`, `AGENTS.md`, an editorconfig, and a gitignore, with `{{PROJECT}}` replaced by the directory name. Three seconds and the repo is agent-ready, with whatever default slash commands and MCP servers I want preconfigured. I used to just copy these files from the last project, which is exactly the kind of small wound that bleeds for a year before you do anything about it.
 
 ## Secrets
 
-Stored in macOS Keychain. The `.zshrc` exposes a one-line helper:
+Stored in macOS Keychain, accessed through a one-liner in `.zshrc`:
 
 ```sh
-kc OPENAI_API_KEY        # prints the secret to stdout
-$(kc GITHUB_TOKEN)       # use inline as a value
+kc OPENAI_API_KEY        # prints to stdout
+$(kc GITHUB_TOKEN)       # inline as a value
 ```
 
-Add a new one with `security add-generic-password -a "$USER" -s NAME -w`. No `.env` files anywhere, no `1Password` CLI dependency, swap to Bitwarden or doppler later without touching the rest of the repo.
+That's it. No `.env` files in random project directories, no extra vault CLI to install, no story about what happens when I switch machines. If I ever want to swap to Bitwarden or doppler I rewrite `kc` and nothing else changes.
 
-## Why bother
+## Why I bothered
 
-The honest answer: I'd been treating Claude Code's config as throwaway, redoing it on every machine. Once I had three machines and started syncing slash commands and hooks between them by hand, it was time. Treating the agent harness as a peer to the shell, in the same repo, with the same install path, removed a whole category of "wait, where did I configure that" moments.
+The honest answer is that I was getting bitten by small inconsistencies. A slash command that worked on my work laptop but not on my personal one. A hook I'd written, forgotten, then re-written slightly differently three months later. A project where the MCP servers I needed were configured on one machine and not the other. None of these are catastrophes individually, but together they were eating an hour a week, and the fix was just to treat the agent harness like I treat everything else: source-controlled, declarative, idempotent.
 
-If you're starting from scratch, fork it or just steal the parts you like. The contract for changing the repo itself is in [AGENTS.md](https://github.com/phoinixi/dotfiles/blob/main/AGENTS.md), and the full source is at [github.com/phoinixi/dotfiles](https://github.com/phoinixi/dotfiles). PRs welcome.
+If you want to fork it, [the repo is here](https://github.com/phoinixi/dotfiles), and the rules I want any agent (or human) to follow when modifying it are in [AGENTS.md](https://github.com/phoinixi/dotfiles/blob/main/AGENTS.md). Steal whatever's useful.
