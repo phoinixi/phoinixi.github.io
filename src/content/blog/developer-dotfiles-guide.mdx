@@ -1,224 +1,91 @@
 ---
-title: " How to setup your Mac for frontend development with dotfiles"
-description: "A detailed guide to my frontend development environment setup with custom dotfiles for improved productivity and efficiency."
-pubDate: 2025-03-20T00:00:00Z
-tags: ["shell", "macos", "productivity", "git", "zsh", "vscode"]
+title: "A macOS dev setup for humans and AI agents"
+description: "My dotfiles now provision two runtimes side by side: the human shell (Ghostty, Zed, zsh) and the Claude Code agent harness. One install.sh handles both."
+pubDate: 2026-05-06
+tags: ["shell", "macos", "productivity", "git", "zsh", "claude-code", "dotfiles"]
 featured: true
 ---
 
-If you've been a developer for any length of time, you know that your environment setup can make or break your productivity. Over the years, I've refined my development environment to a point where I can get a new machine up and running with all my preferred configurations in minutes instead of days.
+I've kept a [dotfiles repo](https://github.com/phoinixi/dotfiles) for years, but it changed shape recently. Until last year it was the usual stuff: brew, zsh, a Brewfile, some macOS defaults. Now it provisions two things side by side: my human shell and the Claude Code agent harness I use every day. Both come up from a single `./install.sh` on a fresh machine.
 
-In this article, I'll walk you through my [dotfiles repository](https://github.com/phoinixi/dotfiles), explaining the key components and how they can supercharge your development workflow.
+This post is the short tour.
 
-## What Are Dotfiles? 📁
+## What's in it now
 
-Dotfiles are configuration files for various tools and applications in Unix-like systems (including macOS). They're called "dotfiles" because they typically begin with a dot (`.`), which makes them hidden in the file system by default.
-
-These files control everything from your shell behavior to application-specific settings. By versioning and sharing them, you can:
-
-1. 🚀 Quickly set up a new development environment
-2. 🔄 Ensure consistency across different machines
-3. 👥 Share your configurations with others
-4. 📝 Document your preferences and tools
-
-## Repository Structure 🏗️
-
-My [dotfiles repository](https://github.com/phoinixi/dotfiles) is organized into a logical structure that makes it easy to find and modify specific configurations:
-
-```
-dotfiles/
-├── git/                    # Git configuration
-├── osx/                    # macOS-specific configurations
-├── utils/                  # Utility scripts
-├── .editorconfig           # Editor configuration
-├── .zshrc                  # Zsh configuration (replaces oh-my-zsh/ folder)
-├── Brewfile                # Homebrew package definitions
-├── install.sh              # Main installation script
-└── README.md               # Documentation
-```
-
-This modular approach makes it easy to find and modify specific parts of your configuration without having to navigate through monolithic files.
-
-## Key Components of My Dotfiles ✨
-
-### Powerful Aliases 💪
-
-My `.zshrc` file includes several useful aliases to speed up common tasks. Some examples:
+The repo is split into modules. The dispatcher (`install.sh`) runs them in order, and you can pick a single module if you only want to refresh part of the setup:
 
 ```bash
-# Replacements for common commands with modern alternatives
-alias ls='eza --icons'
-alias ll='eza -l --icons'
-alias la='eza -la --icons'
-alias cat='bat'
-
-# Navigation & Finder
-alias w="cd ~/workspace"
-alias finder="open ."
-
-# JS Development
-alias nfresh="rm -rf node_modules/ package-lock.json && npm install"
-alias dev="npm run dev"
-
-# System Utilities
-alias ip="ifconfig -a | grep -o 'inet6\\? \\(addr:\\)\\?\\s\\?\\(\\(\\(\[0-9\]\\+\\.\\)\\{3\\}\[0-9\]\\+\\)\\|\[a-fA-F0-9:\]\\+\\)' | awk '{ sub(/inet6? (addr:)? ?/, \"\"); print }'"
-alias clean="find . -name '*.DS_Store' -type f -ls -delete"
-alias zip="zip -r -X -9"
-
-# Update All
-alias update='brew update; brew upgrade; brew cleanup; npm update npm -g; npm update -g;'
+./install.sh                  # everything
+./install.sh --only claude    # re-symlink the agent harness
+./install.sh --only zed
+./install.sh --only ghostty
 ```
 
-Additional aliases, particularly for Git, are provided by the enabled Oh My Zsh plugins (like `git`, `node`, `docker`, etc.).
-
-### Homebrew Package Management: The Brewfile 🍺
-
-The Brewfile is one of the most powerful components of my dotfiles. It leverages Homebrew's bundle functionality to declaratively specify all the packages and applications needed for development.
-
-Here's a snippet from my actual Brewfile:
-
-```ruby
-# Core Utilities
-brew "bash"
-brew "bash-completion@2"
-brew "coreutils"
-brew "git"
-brew "gh"
-brew "curl"
-
-# Development Utilities
-brew "fzf"
-brew "ripgrep"
-brew "bat"
-brew "eza"
-
-# Frontend Development
-brew "fnm"
-brew "pnpm"
-
-# --- Casks ---
-
-# Fonts
-cask "font-hack-nerd-font"
-
-# Terminals
-cask "hyper"
-
-# Editors / IDEs
-cask "visual-studio-code"
-cask "cursor"
-
-# Browsers
-cask "brave-browser"
-
-# Productivity & Utilities
-cask "raycast"
-cask "docker"
-
-# Communication
-cask "slack"
-```
-
-This Brewfile automatically installs:
-
-- 🔧 **Core Utilities:** `bash`, `coreutils`, `git`, `gh`, `curl`, etc.
-- 💻 **Development Utilities:** `fzf` (fuzzy finder), `ripgrep` (search), `bat` (cat clone), `eza` (ls replacement), etc.
-- 🌐 **Frontend:** `fnm` (Node version manager), `pnpm`.
-- ✍️ **Fonts:** `font-hack-nerd-font` (for terminal glyphs).
-- ⌨️ **Apps:** `hyper` (Terminal), VS Code, Cursor, Brave, Raycast, Docker, Slack, etc.
-- ✨ **QuickLook Plugins:** Various plugins for previewing code, markdown, json, etc. (Check `Brewfile` for full list).
-
-When you run the installation script, Homebrew reads this file and installs everything in one go. If a package is already installed, it simply skips it.
-
-### Oh-My-Zsh Configuration 💻
-
-My setup uses [Oh-My-Zsh](https://ohmyz.sh/) as the shell framework, with a customized Solarized Dark theme. The main configuration now resides in the `.zshrc` file in the repository root, which sources Oh My Zsh and applies customizations. This provides:
-
-- 📜 Better command history management
-- ⌨️ Improved tab completion
-- 🧩 Helpful plugins for common tools
-- 🎨 A visually appealing, informative prompt
-
-Here's what my terminal looks like with this configuration:
+Layout, trimmed to the parts that matter:
 
 ```
-username@machine ~/project (main) $
+Brewfile                brew bundle source
+.zshrc                  shell config
+install.sh              dispatcher with --only <module>
+install/                numbered modules (00-brew, ..., 60-macos)
+git/                    gitconfig + global gitignore
+osx/                    macOS defaults
+claude/                 Claude Code harness
+zed/                    editor config
+ghostty/                terminal config
+mcp/                    MCP server templates
+bin/scaffold-ai         per-project bootstrap CLI
+AGENTS.md               contract for agents modifying this repo
 ```
 
-The prompt shows your current directory and git branch at a glance, making it easier to keep track of where you are and what you're working on.
+## The human side
 
-### macOS System Preferences 🖥️
+Pretty standard for a 2026 frontend setup, but a few things changed since the last version of this post:
 
-The repository also includes scripts in the `osx` directory, primarily `index.sh`, that configure various macOS system preferences for a developer-friendly experience. You can review `osx/index.sh` to see the specific settings applied.
+- **Terminal**: [Ghostty](https://ghostty.org) instead of Hyper. Faster, native, no Electron.
+- **Editor**: [Zed](https://zed.dev) as the primary, VS Code kept around as backup. Zed's agent panel and the Claude Code CLI cover most of what I used Cursor for.
+- **CLI tools**: `eza`, `bat`, `ripgrep`, `fzf`, `git-delta`, `zoxide`, `atuin`, `gh`, `httpie`, `jq`/`yq`. `atuin` and `zoxide` are the two I'd miss most if I lost them.
+- **Node**: `fnm` for version management, `pnpm` and `npm` as package managers.
 
-These settings aim to create a more efficient development environment right from the start, with:
+The Brewfile declares all of this. Re-running `brew bundle` from the install script is idempotent, so nothing reinstalls if it's already there.
 
-- 🚀 Performance optimizations
-- 🖥️ Dock settings for optimal screen real estate
-- 🔍 Finder configurations for productivity
-- 🔕 System settings that reduce distractions
+## The agent harness
 
-## Why This Matters for Frontend Developers 🎯
+This is the part that didn't exist a year ago. The `claude/` directory in the repo gets symlinked to `~/.claude/`, which is where Claude Code reads its config from:
 
-As a frontend developer, this dotfiles configuration is specifically tailored for web development workflows:
+- `settings.json` - sanitized, durable preferences only
+- `CLAUDE.md` - global agent memory, loaded into every session
+- `agents/`, `commands/`, `hooks/`, `output-styles/` - my authored cognitive tools
+- `plugins/installed_plugins.json` - declares enabled plugins (`caveman`, `vercel`, `coderabbit`)
 
-1. 📂 **Quick access to projects**: Aliases make it easy to navigate to frequently-used directories
-2. 🔄 **Streamlined Git workflow**: Aliased commands handle common patterns with fewer keystrokes
-3. 🧹 **Consistency in code style**: The `.editorconfig` ensures uniform formatting
-4. ⏱️ **Reduced setup time**: New machines are ready for productive work in minutes
+The trick is the sanitization. Claude Code's live `settings.json` mixes two things: durable preferences (what plugins are on, what edit mode I want) and machine-specific bits like absolute-path permission allowlists. Only the durable part is tracked. The local part lives in `~/.claude/settings.local.json`, which is gitignored, and the install script never touches it.
 
-## Customizing for Your Needs 🛠️
+Before committing pulled changes, I run `./scripts/sync-claude-settings.sh` and it diffs live vs tracked, telling me exactly what would get stripped. Stops me from accidentally checking in someone else's project paths.
 
-While my dotfiles are ready to use out of the box, I encourage you to fork the repository and adapt it to your preferences. The modular structure makes it easy to:
+## Per-project scaffolding
 
-- ➕ Add or remove specific tools in the Brewfile
-- 🔄 Modify aliases to match your workflow
-- ⚙️ Adjust configuration parameters
-- 🔌 Add support for additional applications
+`bin/scaffold-ai` is a small CLI the install script puts on `$PATH`. In any new repo:
 
-## Maintaining Your Dotfiles 🔄
+```bash
+mkdir my-app && cd my-app
+scaffold-ai .
+```
 
-Once you've set up your dotfiles, it's important to keep them updated as your preferences evolve:
+It drops in `.claude/settings.json`, `.claude/commands/`, `.mcp.json`, `AGENTS.md`, `.editorconfig`, and `.gitignore`, with `{{PROJECT}}` replaced by the directory name. Every new project is agent-ready in about three seconds.
 
-1. 🧪 Make changes locally first to test them
-2. 💾 Commit working changes to your repository
-3. 🔄 Pull updates to other machines when needed
-4. 🧹 Periodically review and remove unused configurations
+## Secrets
 
-## Installation 📥
+Stored in macOS Keychain. The `.zshrc` exposes a one-line helper:
 
-Getting started is simple:
+```sh
+kc OPENAI_API_KEY        # prints the secret to stdout
+$(kc GITHUB_TOKEN)       # use inline as a value
+```
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/phoinixi/dotfiles.git ~/.dotfiles
-    ```
-    _(Using `~/.dotfiles` is a common convention, but you can choose another location)_
+Add a new one with `security add-generic-password -a "$USER" -s NAME -w`. No `.env` files anywhere, no `1Password` CLI dependency, swap to Bitwarden or doppler later without touching the rest of the repo.
 
-2.  **Run the installation script:**
-    ```bash
-    cd ~/.dotfiles
-    ./install.sh
-    ```
+## Why bother
 
-The script will handle installing Homebrew, packages, Oh My Zsh, setting up symlinks, and applying macOS settings.
+The honest answer: I'd been treating Claude Code's config as throwaway, redoing it on every machine. Once I had three machines and started syncing slash commands and hooks between them by hand, it was time. Treating the agent harness as a peer to the shell, in the same repo, with the same install path, removed a whole category of "wait, where did I configure that" moments.
 
-3.  **Restart your terminal:** Open a new terminal window/tab or run `source ~/.zshrc`.
-
-4.  **(Manual Step) Configure Git User:**
-    ```bash
-    git config --global user.name "Your Name"
-    git config --global user.email "your.email@example.com"
-    ```
-
-## Conclusion 🏁
-
-A well-crafted set of dotfiles is an investment that pays dividends throughout your development career. My collection has evolved over years of professional work, and I continue to refine it as I discover new tools and techniques.
-
-Whether you use my dotfiles as a starting point or simply as inspiration for your own, I hope this article has shown the value of maintaining a versioned, portable configuration for your development environment.
-
-Check out the [full repository on GitHub](https://github.com/phoinixi/dotfiles) and feel free to raise issues or submit pull requests if you have suggestions for improvements!
-
----
-
-*What's your favorite dotfiles trick? Let me know in the comments below!*
+If you're starting from scratch, fork it or just steal the parts you like. The contract for changing the repo itself is in [AGENTS.md](https://github.com/phoinixi/dotfiles/blob/main/AGENTS.md), and the full source is at [github.com/phoinixi/dotfiles](https://github.com/phoinixi/dotfiles). PRs welcome.
