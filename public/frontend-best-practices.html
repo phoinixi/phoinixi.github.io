@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Frontend Best Practices</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/night.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css" />
+  <style>
+    :root {
+      --accent: #61dafb;
+      --accent-dim: #61dafb44;
+      --section-color: #e5c07b;
+    }
+
+    .reveal .slides section {
+      text-align: left;
+    }
+
+    .reveal h1, .reveal h2 {
+      color: var(--accent);
+      text-transform: none;
+      letter-spacing: -0.02em;
+      font-size: 1.4em;
+      margin-bottom: 0.2em;
+    }
+
+    .reveal h3 {
+      color: var(--section-color);
+      text-transform: none;
+      font-size: 0.95em;
+      margin-bottom: 0.25em;
+      margin-top: 0;
+    }
+
+    .reveal p, .reveal li {
+      font-size: 0.78em;
+      line-height: 1.5;
+    }
+
+    .reveal ul {
+      margin-left: 1.2em;
+      margin-top: 0.3em;
+      margin-bottom: 0.3em;
+    }
+
+    .reveal pre {
+      font-size: 0.56em;
+      box-shadow: none;
+      border: 1px solid #ffffff18;
+      border-radius: 6px;
+      width: 100%;
+      margin: 0.4em 0;
+    }
+
+    .reveal code {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+
+    .reveal .inline-code {
+      background: #ffffff18;
+      padding: 0 0.3em;
+      border-radius: 3px;
+      font-size: 0.9em;
+      color: var(--accent);
+    }
+
+    .tag {
+      display: inline-block;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 4px;
+      padding: 0.1em 0.5em;
+      font-size: 0.6em;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      vertical-align: middle;
+      margin-right: 0.4em;
+    }
+
+    .tag.warn {
+      background: #e5c07b22;
+      color: var(--section-color);
+      border-color: var(--section-color);
+    }
+
+    .tag.good {
+      background: #98c37922;
+      color: #98c379;
+      border-color: #98c379;
+    }
+
+    .slide-section {
+      text-align: center;
+    }
+
+    .slide-section h2 {
+      font-size: 2.2em;
+    }
+
+    .slide-section p {
+      font-size: 1em;
+      color: #aaa;
+      margin-top: 0.3em;
+    }
+
+    .rule {
+      background: #ffffff08;
+      border-left: 3px solid var(--accent);
+      padding: 0.4em 0.7em;
+      border-radius: 0 4px 4px 0;
+      margin: 0.4em 0;
+      font-size: 0.75em;
+    }
+
+    .quote {
+      border-left: 3px solid #666;
+      padding: 0.3em 0.7em;
+      color: #aaa;
+      font-style: italic;
+      font-size: 0.7em;
+      margin-top: 0.4em;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1em;
+      align-items: start;
+    }
+
+    .two-col pre {
+      font-size: 0.52em;
+    }
+
+    .col-label {
+      font-size: 0.62em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.3em;
+    }
+
+    .col-label.bad { color: #e06c75; }
+    .col-label.good { color: #98c379; }
+    .col-label.neutral { color: var(--accent); }
+
+    .table-compare {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.72em;
+      margin-top: 0.6em;
+    }
+
+    .table-compare th {
+      border-bottom: 1px solid #444;
+      padding: 0.3em 0.6em;
+      color: var(--accent);
+      text-align: left;
+    }
+
+    .table-compare td {
+      padding: 0.3em 0.6em;
+      border-bottom: 1px solid #ffffff10;
+    }
+
+    .title-slide {
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .title-slide::after {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -10%;
+      width: 55%;
+      height: 160%;
+      background: radial-gradient(ellipse at center, #61dafb0d 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      font-size: 0.6em;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 0.6em;
+      opacity: 0.85;
+    }
+
+    .title-slide h1 {
+      font-size: 2.6em;
+      line-height: 1.05;
+      margin: 0 0 0.15em;
+      letter-spacing: -0.03em;
+    }
+
+    .title-divider {
+      width: 48px;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 2px;
+      margin: 0.5em 0 0.7em;
+    }
+
+    .title-slide .subtitle {
+      color: #888;
+      font-size: 0.8em;
+      margin: 0 0 1.4em;
+    }
+
+    .title-slide .topics {
+      display: flex;
+      gap: 0.5em;
+      flex-wrap: nowrap;
+    }
+
+    .topic-pill {
+      border-radius: 99px;
+      padding: 0.22em 0.75em;
+      font-size: 0.58em;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      border: 1px solid;
+      white-space: nowrap;
+    }
+
+    .topic-pill.p1 { color: #61dafb; border-color: #61dafb40; background: #61dafb0d; }
+    .topic-pill.p2 { color: #c678dd; border-color: #c678dd40; background: #c678dd0d; }
+    .topic-pill.p3 { color: #98c379; border-color: #98c37940; background: #98c3790d; }
+    .topic-pill.p4 { color: #e5c07b; border-color: #e5c07b40; background: #e5c07b0d; }
+
+    .agenda {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .agenda li {
+      display: flex;
+      align-items: center;
+      gap: 0.6em;
+      padding: 0.4em 0;
+      border-bottom: 1px solid #ffffff10;
+      font-size: 0.88em;
+    }
+
+    .agenda li .num {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.9em;
+      min-width: 1.4em;
+    }
+
+    .big-rule {
+      text-align: center;
+      font-size: 1.2em;
+      font-weight: 700;
+      color: var(--accent);
+      margin: 0.5em 0;
+      line-height: 1.4;
+    }
+
+    .closing-slide {
+      text-align: center;
+    }
+
+    .closing-slide h2 {
+      font-size: 2em;
+    }
+
+    .reveal .slide-number {
+      top: 12px;
+      bottom: auto;
+      right: 16px;
+      font-size: 16px;
+      background: transparent;
+      color: #ffffff55;
+    }
+  </style>
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+
+    <!-- TITLE -->
+    <section>
+      <div class="title-slide">
+        <h1>Frontend<br>Best Practices</h1>
+        <div class="title-divider"></div>
+        <p class="subtitle">From components to the server</p>
+        <div class="topics">
+          <span class="topic-pill p1">Components</span>
+          <span class="topic-pill p2">State Management</span>
+          <span class="topic-pill p3">Server Communication</span>
+          <span class="topic-pill p4">CSS</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- AGENDA -->
+    <section>
+      <h2>Today's agenda</h2>
+      <ul class="agenda">
+        <li><span class="num">01</span> Components: structure and responsibility</li>
+        <li><span class="num">02</span> State management: where state lives</li>
+        <li><span class="num">03</span> Server communication: fetching done right</li>
+        <li><span class="num">04</span> CSS: tokens, utilities, responsiveness</li>
+        <li><span class="num">05</span> Cross-cutting: TypeScript and structure</li>
+      </ul>
+    </section>
+
+    <!-- WHY IT MATTERS -->
+    <section>
+      <h2>Why this matters</h2>
+      <ul>
+        <li>Code you write today, someone reads tomorrow <em>(often: you)</em></li>
+        <li>Bad practices compound: one messy component, then a messy codebase</li>
+        <li>Best practices exist because people got burned</li>
+        <li>The goal is not clever code. It's <strong>boring, obvious code</strong> that ships and survives</li>
+      </ul>
+      <div class="quote">
+        "Any fool can write code that a computer can understand. Good programmers write code that humans can understand." — Martin Fowler
+      </div>
+    </section>
+
+    <!-- COMPONENTS SECTION -->
+    <section class="slide-section">
+      <h2>Components</h2>
+      <p>Structure &amp; responsibility</p>
+    </section>
+
+    <!-- SINGLE RESPONSIBILITY -->
+    <section>
+      <h2>Single responsibility</h2>
+      <h3>One component, one job</h3>
+      <div class="two-col">
+        <div>
+          <p class="col-label bad">Doing too much</p>
+          <pre><code class="language-jsx">function UserCard() {
+  const [user, setUser] = useState(null)
+
+  useEffect(() => {
+    fetch('/api/user')
+      .then(r =&gt; r.json())
+      .then(setUser)
+  }, [])
+
+  // fetches + renders + formats
+  // + handles error + loading...
+  return &lt;div&gt;...&lt;/div&gt;
+}</code></pre>
+        </div>
+        <div class="fragment">
+          <p class="col-label good">Split concerns</p>
+          <pre><code class="language-jsx">// hook: just fetches
+function useUser(id) {
+  return useQuery({
+    queryKey: ['user', id],
+    queryFn: () =&gt; getUser(id),
+  })
+}
+
+// component: just renders
+function UserCard({ user }) {
+  return &lt;div&gt;{user.name}&lt;/div&gt;
+}</code></pre>
+        </div>
+      </div>
+      <div class="rule fragment">If describing this component takes the word "and", it's doing too much.</div>
+    </section>
+
+    <!-- CO-LOCATION -->
+    <section>
+      <h2>Co-location</h2>
+      <h3>Keep things together that change together</h3>
+      <pre><code class="language-bash">components/
+  UserCard/
+    UserCard.tsx          ← component
+    UserCard.test.tsx     ← tests here, not in __tests__/
+    UserCard.module.css   ← styles here, not in styles/
+    index.ts              ← re-export for clean imports</code></pre>
+      <ul>
+        <li>Delete the component, everything goes with it</li>
+        <li>No hunting across folders to find related files</li>
+        <li>A test next to the component is a reminder to write it</li>
+      </ul>
+      <div class="rule">Move files that change together. Separate files that change independently.</div>
+    </section>
+
+    <!-- COMPOSITION OVER CONFIG -->
+    <section>
+      <h2>Composition over config</h2>
+      <h3>Small and flexible beats big and opinionated</h3>
+      <div class="two-col">
+        <div>
+          <p class="col-label bad">Mega-props</p>
+          <pre><code class="language-jsx">&lt;Button
+  icon="star"
+  iconPosition="left"
+  loading={true}
+  badge={3}
+  badgeVariant="error"
+  size="lg"
+  variant="primary"
+/&gt;</code></pre>
+        </div>
+        <div class="fragment">
+          <p class="col-label good">Composable</p>
+          <pre><code class="language-jsx">&lt;Button&gt;
+  &lt;StarIcon /&gt;
+  Save
+  &lt;Badge variant="error"&gt;3&lt;/Badge&gt;
+&lt;/Button&gt;</code></pre>
+        </div>
+      </div>
+      <ul class="fragment">
+        <li>Consumers control structure, no guessing which prop to use</li>
+        <li>New combinations don't require new props on the base component</li>
+      </ul>
+    </section>
+
+    <!-- DON'T OVER-ABSTRACT -->
+    <section>
+      <h2>Don't over-abstract</h2>
+      <h3>The rule of three</h3>
+      <p>Extract only after writing it <strong>three times</strong>.</p>
+      <ul>
+        <li>First time: just write it</li>
+        <li>Second time: tolerate the duplication</li>
+        <li>Third time: you understand the pattern now, extract it</li>
+      </ul>
+      <div class="rule">
+        Before abstracting: do these cases actually belong together, or am I forcing a pattern?
+      </div>
+      <div class="quote">
+        "Duplication is far cheaper than the wrong abstraction." — Sandi Metz
+      </div>
+    </section>
+
+    <!-- STATE MANAGEMENT SECTION -->
+    <section class="slide-section">
+      <h2>State Management</h2>
+      <p>Where state lives</p>
+    </section>
+
+    <!-- STATE PROXIMITY -->
+    <section>
+      <h2>State proximity</h2>
+      <h3>Start local. Go global only when you must.</h3>
+      <pre><code class="language-jsx">// Step 1: local state (most state lives here)
+const [isOpen, setIsOpen] = useState(false)
+
+// Step 2: lift up when two siblings need the same state
+// (shared parent owns it, passes down as props)
+
+// Step 3: Context when many components need the same state
+// (theme, locale, auth user)
+
+// Step 4: Zustand / Jotai for complex global state
+// (rare, and earned)</code></pre>
+      <div class="rule">
+        Most state never needs to leave the component. The farther it travels, the harder it is to reason about.
+      </div>
+    </section>
+
+    <!-- SERVER STATE VS UI STATE -->
+    <section>
+      <h2>Server state vs UI state</h2>
+      <h3>Different problems. Different tools.</h3>
+      <table class="table-compare">
+        <thead>
+          <tr>
+            <th>UI State</th>
+            <th>Server State</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>isOpen, activeTab</td><td>user data, product list</td></tr>
+          <tr><td>isDarkMode</td><td>cart items, notifications</td></tr>
+          <tr><td>form input</td><td>search results</td></tr>
+          <tr><td><span class="inline-code">useState</span> / Context</td><td>React Query / SWR</td></tr>
+        </tbody>
+      </table>
+      <div class="rule" style="margin-top:0.8em">
+        Don't store server data in <span class="inline-code">useState</span>. You'll re-invent caching, loading, and stale-data handling badly.
+      </div>
+    </section>
+
+    <!-- PROP DRILLING -->
+    <section>
+      <h2>Avoid prop drilling</h2>
+      <h3>...but don't reach for global state too fast</h3>
+      <div class="two-col">
+        <div>
+          <p class="col-label bad">Drilling through 3+ levels</p>
+          <pre><code class="language-jsx">&lt;App&gt;
+  &lt;Dashboard user={user}&gt;
+    &lt;Sidebar user={user}&gt;
+      &lt;Avatar user={user} /&gt;
+    &lt;/Sidebar&gt;
+  &lt;/Dashboard&gt;
+&lt;/App&gt;</code></pre>
+        </div>
+        <div class="fragment">
+          <p class="col-label good">Options</p>
+          <pre><code class="language-jsx">// 1. Composition: pass components
+&lt;Dashboard&gt;
+  &lt;Sidebar&gt;
+    &lt;Avatar /&gt; {/* fetches own data */}
+  &lt;/Sidebar&gt;
+&lt;/Dashboard&gt;
+
+// 2. Context (when truly shared)
+const user = useUser()
+
+// 3. Component fetches its own data</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- SERVER COMMUNICATION SECTION -->
+    <section class="slide-section">
+      <h2>Server Communication</h2>
+      <p>Fetching data, done right</p>
+    </section>
+
+    <!-- SEPARATE FETCHING FROM RENDERING -->
+    <section>
+      <h2>Separate fetching from rendering</h2>
+      <div class="two-col">
+        <div>
+          <p class="col-label bad">Mixed together</p>
+          <pre><code class="language-jsx">function UserProfile() {
+  const [user, setUser] = useState(null)
+
+  useEffect(() =&gt; {
+    fetch('/api/user/1')
+      .then(r =&gt; r.json())
+      .then(setUser)
+  }, [])
+
+  return &lt;div&gt;{user?.name}&lt;/div&gt;
+}</code></pre>
+        </div>
+        <div class="fragment">
+          <p class="col-label good">Separated</p>
+          <pre><code class="language-jsx">function useUser(id) {
+  return useQuery({
+    queryKey: ['user', id],
+    queryFn: () =&gt; getUser(id),
+  })
+}
+
+function UserProfile({ id }) {
+  const { data } = useUser(id)
+  return &lt;div&gt;{data?.name}&lt;/div&gt;
+}</code></pre>
+        </div>
+      </div>
+      <ul class="fragment">
+        <li>Hooks are testable in isolation</li>
+        <li>React Query gives caching, deduplication, and refetching for free</li>
+      </ul>
+    </section>
+
+    <!-- ERROR AND LOADING -->
+    <section>
+      <h2>Loading &amp; error states are first-class</h2>
+      <h3>Every fetch has 3 states. All 3 are UX.</h3>
+      <pre><code class="language-jsx">function UserProfile({ id }) {
+  const { data, isLoading, error } = useUser(id)
+
+  if (isLoading) return &lt;Skeleton /&gt;
+  if (error) return &lt;ErrorMessage error={error} /&gt;
+
+  return &lt;Profile user={data} /&gt;
+}</code></pre>
+      <div class="rule">If you don't handle loading and error, the feature is not done.</div>
+    </section>
+
+
+    <!-- CSS SECTION -->
+    <section class="slide-section">
+      <h2>CSS</h2>
+      <p>Tokens, utilities, and responsiveness</p>
+    </section>
+
+    <!-- UTILITY VS SEMANTIC -->
+    <section>
+      <h2>Utility-first vs semantic CSS</h2>
+      <h3>Two valid approaches. Pick one. Be consistent.</h3>
+      <div class="two-col">
+        <div>
+          <p class="col-label neutral">Tailwind (utility-first)</p>
+          <pre><code class="language-jsx">&lt;button className="
+  px-4 py-2 rounded
+  bg-blue-500 text-white
+  hover:bg-blue-600
+  disabled:opacity-50
+"&gt;
+  Save
+&lt;/button&gt;</code></pre>
+        </div>
+        <div class="fragment">
+          <p class="col-label neutral">CSS Modules (semantic)</p>
+          <pre><code class="language-jsx">&lt;button className={styles.primaryButton}&gt;
+  Save
+&lt;/button&gt;
+
+/* UserCard.module.css */
+.primaryButton {
+  padding: 0.5rem 1rem;
+  background: var(--color-brand);
+  border-radius: var(--radius-md);
+}</code></pre>
+        </div>
+      </div>
+      <table class="table-compare fragment" style="margin-top:0.4em">
+        <tr><th>Tailwind</th><th>CSS Modules</th></tr>
+        <tr><td>Fast to write, no naming</td><td>Clean JSX, explicit naming</td></tr>
+        <tr><td>Verbose className strings</td><td>More context-switching</td></tr>
+      </table>
+    </section>
+
+    <!-- DESIGN TOKENS -->
+    <section>
+      <h2>Design tokens</h2>
+      <h3>One source of truth. Never hardcode values.</h3>
+      <div class="two-col">
+        <div>
+          <p class="col-label bad">Magic values everywhere</p>
+          <pre><code class="language-css">.card  { border-radius: 8px; padding: 16px; }
+.modal { border-radius: 8px; padding: 24px; }
+.btn   { border-radius: 8px; color: #1a1a2e; }</code></pre>
+        </div>
+        <div class="fragment">
+          <p class="col-label good">Tokens</p>
+          <pre><code class="language-css">:root {
+  --radius-md: 8px;
+  --color-text: #1a1a2e;
+  --space-md: 16px;
+  --space-lg: 24px;
+}
+
+.card  { border-radius: var(--radius-md); padding: var(--space-md); }
+.modal { border-radius: var(--radius-md); padding: var(--space-lg); }
+.btn   { border-radius: var(--radius-md); color: var(--color-text); }</code></pre>
+        </div>
+      </div>
+      <div class="rule fragment">Change the token, change it everywhere. Consistency becomes automatic.</div>
+    </section>
+
+    <!-- RESPONSIVE -->
+    <section>
+      <h2>Responsive by default</h2>
+      <h3>Mobile-first. Add complexity as screen grows.</h3>
+      <pre><code class="language-css">.grid {
+  display: grid;
+  grid-template-columns: 1fr;        /* mobile */
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;  /* tablet */
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr); /* desktop */
+  }
+}</code></pre>
+      <div class="rule">Start with the smallest screen. Override upward. Desktop-first leads to <span class="inline-code">max-width</span> soup.</div>
+    </section>
+
+    <!-- CROSS-CUTTING SECTION -->
+    <section class="slide-section">
+      <h2>Cross-cutting concerns</h2>
+      <p>TypeScript &amp; folder structure</p>
+    </section>
+
+    <!-- TYPESCRIPT -->
+    <section>
+      <h2>TypeScript at boundaries</h2>
+      <h3>Type the edges. Let inference do the rest.</h3>
+      <pre><code class="language-typescript">// Type API responses (you don't control these)
+type User = {
+  id: string
+  name: string
+  role: 'admin' | 'user'
+}
+
+// Type component props (your public interface)
+type UserCardProps = {
+  user: User
+  onFollow: (id: string) =&gt; void
+}
+
+// Don't over-type internals, let TypeScript infer
+const doubled = [1, 2, 3].map(n =&gt; n * 2)  // number[] ✓
+// const doubled: number[] = ...             // redundant</code></pre>
+      <div class="rule">Types are documentation the compiler checks. Focus them on API responses, props, and function signatures.</div>
+    </section>
+
+    <!-- FOLDER STRUCTURE -->
+    <section>
+      <h2>Folder structure</h2>
+      <h3>Feature-based scales. Type-based breaks.</h3>
+      <div class="two-col">
+        <div>
+          <p class="col-label bad">Type-based (breaks at scale)</p>
+          <pre><code class="language-bash">src/
+  components/
+    # 200 files
+    # no way to know what
+    # relates to what
+  hooks/
+    # another 80 files
+  utils/
+    # who knows</code></pre>
+        </div>
+        <div class="fragment">
+          <p class="col-label good">Feature-based (scales)</p>
+          <pre><code class="language-bash">src/
+  features/
+    auth/
+      components/
+      hooks/
+      api/
+    dashboard/
+      components/
+      hooks/
+      api/
+  shared/
+    components/   ← truly reusable
+    hooks/
+    utils/</code></pre>
+        </div>
+      </div>
+      <div class="rule fragment">If you delete a feature, how many folders do you touch? Ideally one.</div>
+    </section>
+
+    <!-- GOLDEN RULE -->
+    <section>
+      <h2>The golden rule</h2>
+      <div class="big-rule" style="margin: 0.8em 0">
+        Write code for the next developer.
+      </div>
+      <ul>
+        <li>Would you understand this without comments?</li>
+        <li>Does the component name tell you what it does?</li>
+        <li>Is the folder structure obvious to someone who didn't write it?</li>
+        <li>Would a deletion leave no orphaned files behind?</li>
+      </ul>
+    </section>
+
+<!-- CLOSING -->
+    <section class="slide-section">
+      <h2>Questions?</h2>
+      <p style="margin-top:0.8em; color:#aaa">Ask anything. No question is too basic.</p>
+    </section>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    controls: true,
+    progress: true,
+    slideNumber: true,
+    transition: 'slide',
+    transitionSpeed: 'fast',
+    plugins: [RevealHighlight, RevealNotes],
+  })
+</script>
+</body>
+</html>
