@@ -6,7 +6,6 @@ export const SITE_DESCRIPTION = "Personal website and portfolio";
 export const HEADER_LINKS: NavLink[] = [
   { name: "Home", url: "/" },
   { name: "Blog", url: "/blog" },
-  { name: "Notes", url: "/notes" },
   { name: "Projects", url: "/projects" },
   { name: "About", url: "/about" },
 ];

@@ -1,8 +1,8 @@
 ---
 import "../styles/global.css";
+import { ClientRouter } from "astro:transitions";
 import BaseHead from "../components/layout/BaseHead.astro";
 import Header from "../components/layout/Header.astro";
-import StatusBar from "../components/layout/StatusBar.astro";
 import Footer from "../components/layout/Footer.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 
@@ -32,8 +32,7 @@ const {
     <link rel="preload" href={frauncesItalicUrl} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={monoUrl} as="font" type="font/woff2" crossorigin />
 
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>{title}</title>
+    <ClientRouter />
 
     <script
       is:inline
@@ -43,7 +42,6 @@ const {
   </head>
   <body>
     <Header />
-    <StatusBar />
     <main class="t-main">
       <slot />
     </main>

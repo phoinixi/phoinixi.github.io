@@ -1,0 +1,13 @@
+---
+interface Props {
+  label: string;
+  meta?: string;
+  class?: string;
+}
+const { label, meta, class: cls } = Astro.props;
+---
+<section class:list={["panel", cls]}>
+  <span class="panel-label">{label}</span>
+  {meta && <span class="panel-meta">{meta}</span>}
+  <slot />
+</section>

@@ -1,21 +1,21 @@
 ---
-title: "Frontend Developer Dotfiles"
-description: "Dotfiles for frontend development in macOS. Includes oh-my-zsh configuration, VS Code settings, git aliases, and various productivity utilities."
+title: "Software Engineer Dotfiles"
+description: "Dotfiles for software engineering on macOS. Includes oh-my-zsh configuration, VS Code settings, git aliases, and various productivity utilities."
 link: "https://github.com/phoinixi/dotfiles"
 year: "2023"
 tags: ["shell", "zsh", "macos", "git"]
-featured: false
+featured: true
 ---
 
-# Frontend Developer Dotfiles
+# Software Engineer Dotfiles
 
-A comprehensive collection of dotfiles and configuration scripts for setting up a complete frontend development environment on macOS. This repository makes it quick and easy to configure a new machine with a consistent development setup.
+A comprehensive collection of dotfiles and configuration scripts for setting up a complete software engineering environment on macOS. This repository makes it quick and easy to configure a new machine with a consistent development setup.
 
 ## Features
 
 - Oh-My-Zsh setup with custom theme and plugins
 - Git configuration with useful aliases and shortcuts
-- VS Code settings optimized for frontend development
+- VS Code settings optimized for daily development
 - Homebrew setup with essential development tools
 - macOS system preferences tuned for developers
 

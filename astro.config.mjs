@@ -20,15 +20,3 @@ export default defineConfig({
     prefetchAll: true,
   },
 });
-
-// Helper function to generate slugs from titles (will be used in content configuration)
-export function slugify(text) {
-  return text
-    .toString()
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[^\w-]+/g, "")
-    .replace(/--+/g, "-")
-    .replace(/^-+/, "")
-    .replace(/-+$/, "");
-}

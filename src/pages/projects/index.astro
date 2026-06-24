@@ -1,5 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import Panel from "../../components/layout/Panel.astro";
 import { getCollection, type CollectionEntry } from "astro:content";
 
 type Project = CollectionEntry<"projects">;
@@ -17,98 +18,62 @@ const rest = all
 
 <Layout title="Projects | Francesco Esposito">
   <section class="t-page">
-    <header class="t-section-head">
-      <span class="t-section-num">/01</span>
-      <h1 class="t-section-title">PROJECTS</h1>
-      <span class="t-mono-sm t-dim">open-source &amp; experiments</span>
-      <span class="t-spacer"></span>
-      <span class="t-mono-sm t-dim">{all.length} total</span>
+    <header class="t-page-head">
+      <h1 class="t-section-title">projects</h1>
+      <span class="t-mono-sm t-dim">open-source &amp; experiments · {all.length} total</span>
     </header>
 
     {featured.length > 0 && (
-      <section class="t-feat">
-        <header class="t-section-head t-section-head-sub">
-          <span class="t-section-num">/02</span>
-          <h2 class="t-section-title">FEATURED</h2>
-          <span class="t-spacer"></span>
-          <span class="t-mono-sm t-dim">{featured.length}</span>
-        </header>
-        <div class="t-feat-grid">
-          {featured.map((p, i) => (
-            <article class="t-feat-card">
-              <div class="t-feat-top">
-                <span class="t-mono-sm t-dim">/{String(i + 1).padStart(2, "0")}</span>
-                <span class="t-mono-sm">{p.data.year}</span>
-              </div>
-              <h3 class="t-feat-title">{p.data.title}</h3>
-              <p class="t-feat-blurb">{p.data.description}</p>
-              <div class="t-feat-tags">
+      <Panel label="featured" meta={String(featured.length)}>
+        <ul class="trows">
+          {featured.map((p) => (
+            <li class="trow-item">
+              <a class="trow" href={p.data.link} target="_blank" rel="noopener">
+                <span class="trow-title">{p.data.title}</span>
+                <span class="trow-lead"></span>
+                <span class="trow-meta">{p.data.year}</span>
+              </a>
+              <p class="trow-desc">{p.data.description}</p>
+              <div class="trow-sub">
                 {p.data.tags.map((t: string) => <span class="t-pill">#{t}</span>)}
-              </div>
-              <div class="t-feat-foot">
+                <span class="t-spacer"></span>
                 <a class="t-mono-sm t-link" href={p.data.link} target="_blank" rel="noopener">view ↗</a>
               </div>
-            </article>
-          ))}
-        </div>
-      </section>
-    )}
-
-    {rest.length > 0 && (
-      <section class="t-rest">
-        <header class="t-section-head t-section-head-sub">
-          <span class="t-section-num">/{featured.length > 0 ? "03" : "02"}</span>
-          <h2 class="t-section-title">ARCHIVE</h2>
-          <span class="t-spacer"></span>
-          <span class="t-mono-sm t-dim">{rest.length}</span>
-        </header>
-        <ul class="t-list">
-          {rest.map((p) => (
-            <li class="t-list-row">
-              <a href={p.data.link} target="_blank" rel="noopener" class="t-list-link">
-                <span class="t-mono-sm t-dim t-list-date">{p.data.year}</span>
-                <span class="t-list-title">{p.data.title}</span>
-                <span class="t-list-blurb t-mono-sm t-dim">{p.data.description}</span>
-                <span class="t-spacer"></span>
-                {p.data.tags?.[0] && <span class="t-mono-sm t-tag-sm">#{p.data.tags[0]}</span>}
-                <span class="t-mono-sm t-dim t-list-arrow">↗</span>
-              </a>
             </li>
           ))}
         </ul>
-      </section>
+      </Panel>
+    )}
+
+    {rest.length > 0 && (
+      <Panel label="archive" meta={String(rest.length)}>
+        <ul class="trows">
+          {rest.map((p) => (
+            <li class="trow-item">
+              <a class="trow" href={p.data.link} target="_blank" rel="noopener">
+                <span class="trow-date">{p.data.year}</span>
+                <span class="trow-title">{p.data.title}</span>
+                <span class="trow-lead"></span>
+                {p.data.tags?.[0] && <span class="trow-meta">#{p.data.tags[0]}</span>}
+                <span class="trow-meta">↗</span>
+              </a>
+              <p class="trow-desc trow-desc-sm">{p.data.description}</p>
+            </li>
+          ))}
+        </ul>
+      </Panel>
     )}
   </section>
 </Layout>
 
 <style>
-  .t-page { padding: 24px 0 56px; }
-  .t-feat { padding: 32px 0; }
-  .t-section-head-sub { margin-top: 24px; }
-  .t-feat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--line); }
-  .t-feat-card { display: flex; flex-direction: column; gap: 12px; padding: 24px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--bg-2); }
-  .t-feat-card:nth-child(2n) { border-right: 0; }
-  .t-feat-card:hover { outline: 1px solid var(--accent); outline-offset: -1px; }
-  .t-feat-top { display: flex; justify-content: space-between; }
-  .t-feat-title { font-family: var(--serif); font-weight: 400; font-size: 28px; letter-spacing: -0.01em; margin: 0; color: var(--ink); }
-  .t-feat-blurb { font-family: var(--serif); font-size: 16px; line-height: 1.45; color: var(--ink-2); margin: 0; }
-  .t-feat-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-  .t-feat-foot { margin-top: auto; display: flex; align-items: center; padding-top: 8px; border-top: 1px dashed var(--line); }
+  .t-page { padding: 8px 0 56px; }
+  .t-page-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+  .trow-desc-sm { font-size: 14px; color: var(--dim); }
 
-  .t-rest { padding: 32px 0 56px; }
-  .t-list { list-style: none; margin: 0; padding: 0; }
-  .t-list-row { border-bottom: 1px solid var(--line); }
-  .t-list-link { display: flex; align-items: baseline; gap: 14px; padding: 12px 0; text-decoration: none; color: inherit; transition: padding .15s, background .15s; }
-  .t-list-link:hover { padding-left: 8px; background: linear-gradient(90deg, rgba(216,255,62,0.05), transparent 30%); }
-  .t-list-date { width: 56px; flex-shrink: 0; color: var(--dim); }
-  .t-list-title { font-family: var(--serif); font-size: 19px; color: var(--ink); flex-shrink: 0; }
-  .t-list-blurb { color: var(--dim); text-transform: none; letter-spacing: 0; font-size: 12px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .t-list-arrow { color: var(--dim); }
-  .t-tag-sm { font-family: var(--mono); font-size: 10px; color: var(--accent); letter-spacing: 0.06em; text-transform: lowercase; padding: 1px 6px; border: 1px solid var(--line-2); }
-
-  @media (max-width: 768px) {
-    .t-feat-grid { grid-template-columns: 1fr; }
-    .t-feat-card { border-right: 0 !important; }
-    .t-list-blurb { display: none; }
+  @media (max-width: 640px) {
+    .trow { flex-wrap: wrap; }
+    .trow-date { width: auto; }
+    .trow-lead { display: none; }
   }
 </style>

@@ -1,4 +1,4 @@
-import { defineCollection, z, reference } from "astro:content";
+import { defineCollection, z } from "astro:content";
 
 // Define blog schema
 const blogCollection = defineCollection({
@@ -11,18 +11,6 @@ const blogCollection = defineCollection({
     heroImage: z.string().optional(),
     featured: z.boolean().default(false),
     tags: z.array(z.string()),
-    relatedPosts: z.array(reference("blog")).optional(),
-  }),
-});
-
-// Define notes schema
-const notesCollection = defineCollection({
-  type: "content",
-  schema: z.object({
-    title: z.string(),
-    date: z.date(),
-    tags: z.array(z.string()).default([]),
-    relatedNotes: z.array(reference("notes")).optional(),
   }),
 });
 
@@ -37,7 +25,6 @@ const projectsCollection = defineCollection({
     tags: z.array(z.string()),
     draft: z.boolean().default(false),
     featured: z.boolean().default(false),
-    relatedProjects: z.array(reference("projects")).optional(),
   }),
 });
 
@@ -54,7 +41,6 @@ const pagesCollection = defineCollection({
 // Export collections
 export const collections = {
   blog: blogCollection,
-  notes: notesCollection,
   projects: projectsCollection,
   pages: pagesCollection,
 };
